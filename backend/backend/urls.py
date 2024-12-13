@@ -20,5 +20,6 @@ from app.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('wel/', ReactView.as_view(), name="something"),
+    path('wel/', ReactView.as_view(), name="get"),
+    path('wel/<int:pk>/', ReactView.as_view(), name="delete"),
 ]
