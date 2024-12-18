@@ -8,4 +8,4 @@ class React(models.Model):
 
 
 class File(models.Model):
-    file = models.FileField(upload_to=os.path.join(settings.BASE_DIR, 'uploads/'), blank=True, null=True) 
+    file = models.FileField(upload_to='uploads/', blank=True, null=True) 

@@ -7,18 +7,19 @@ class App extends React.Component {
   state = {
     details: [],
     inputText: "",
+    file: null,
   };
 
-
   getData = () => {
-    axios.get("http://localhost:8000/wel/")
-    .then((res) => {
-      this.setState({
-        details: res.data,
-      });
-    })
-    .catch((err) => { });
-  }
+    axios
+      .get("http://localhost:8000/wel/")
+      .then((res) => {
+        this.setState({
+          details: res.data,
+        });
+      })
+      .catch((err) => {});
+  };
 
   componentDidMount() {
     let data;
@@ -30,6 +31,35 @@ class App extends React.Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
+  };
+
+  handleFileChange = (e) => {
+    this.setState({
+      file: e.target.files[0],
+    });
+  };
+
+  handleFileUpload = (e) => {
+    e.preventDefault();
+    const file = this.state.file;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("filename", file.name);
+
+    axios
+      .post("http://localhost:8000/file/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => {
+        this.setState({
+          file: null,
+        });
+      })
+      .catch((err) => {
+        console.error("Error uploading file: ", err);
+      });
   };
 
   handleSubmit = (e) => {
@@ -45,7 +75,7 @@ class App extends React.Component {
           inputText: "",
         });
       })
-      .catch((err) => { });
+      .catch((err) => {});
   };
 
   handleRemove = (e, id) => {
@@ -62,7 +92,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="container jumbotron ">
+      <div className="container">
         <form onSubmit={this.handleSubmit}>
           <div>
             <div>
@@ -77,6 +107,18 @@ class App extends React.Component {
             />
           </div>
 
+          <button type="submit">Prześlij</button>
+        </form>
+
+        <br></br>
+
+        <form onSubmit={this.handleFileUpload}>
+          <div>
+            <div>
+              <span>Plik do backendu</span>
+            </div>
+            <input type="file" onChange={this.handleFileChange} />
+          </div>
           <button type="submit">Prześlij</button>
         </form>
 

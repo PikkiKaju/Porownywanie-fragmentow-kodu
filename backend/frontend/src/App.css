@@ -37,6 +37,10 @@
   }
 }
 
+.container {
+  margin: 30px;
+}
+
 .card {
   display: flex;
   align-items: center;
