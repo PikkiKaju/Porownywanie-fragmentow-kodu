@@ -26,6 +26,7 @@ urlpatterns = [
     path('wel/<int:pk>/', TextView.as_view(), name="deleteText"),
     path('file/', FileView.as_view(), name="getFiles"),
     path('file/<int:pk>/', FileView.as_view(), name="deleteFile"),
+    path('analyze/', HDHGNFileView.as_view(), name="analyzeFile"),
 ]
 
 if settings.DEBUG:
