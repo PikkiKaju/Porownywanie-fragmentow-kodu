@@ -18,13 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from app.views import *
+from backend import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('wel/', ReactView.as_view(), name="get"),
-    path('wel/<int:pk>/', ReactView.as_view(), name="delete"),
-    path('file/', FileView.as_view(), name="file"),
-
+    path('wel/', TextView.as_view(), name="getTexts"),
+    path('wel/<int:pk>/', TextView.as_view(), name="deleteText"),
+    path('file/', FileView.as_view(), name="getFiles"),
+    path('file/<int:pk>/', FileView.as_view(), name="deleteFile"),
 ]
 
 if settings.DEBUG:

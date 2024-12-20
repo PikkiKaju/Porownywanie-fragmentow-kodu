@@ -1,52 +1,68 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework import status
 
-from . models import *
-from . serializer import *
+from .models import *
+from .serializer import *
 
-class ReactView(APIView):
-  serializer_class = ReactSerializer
+# Class-based view for handling Text-related data (text input)
+class TextView(APIView):
+  serializer_class = TextSerializer 
 
+  # GET method to retrieve all Text objects
   def get(self, request):
-    detail = [ {"id":detail.id, "inputText": detail.inputText} for detail in React.objects.all()]
-    return Response(detail)
+    # A list of dictionaries containing the id and inputText of each Text object
+    textDetail = [{"id": detail.id, "inputText": detail.inputText} for detail in Text.objects.all()]
+    return Response(textDetail)
 
+  # POST method to create a new Text object
   def post(self, request):
-    serializer = ReactSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
-      serializer.save()
+    # Create a serializer instance with the request data
+    serializer = TextSerializer(data=request.data)  
+
+    # Check if the data is valid
+    if serializer.is_valid(raise_exception=True):  
+      serializer.save()  # Save the new Text object to the database
       return Response(serializer.data)
-      
+
+  # DELETE method to delete a Text object by its primary key (pk)
   def delete(self, request, pk):
     try:
-      react_object = React.objects.get(pk=pk)
-      react_object.delete()
-      return Response(status=status.HTTP_204_NO_CONTENT) 
-    except React.DoesNotExist:
+      react_object = Text.objects.get(pk=pk)  # Retrieve the Text object to be deleted
+      react_object.delete()  # Delete the object from the database
+      return Response(status=status.HTTP_204_NO_CONTENT)
+    except Text.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
-    
 
+
+# Class-based view for handling file uploads
 class FileView(APIView):
-  parser_classes = [MultiPartParser]
+  parser_classes = [MultiPartParser]  # Set the parser for handling multipart form data (file uploads)
   serializer_class = FileSerializer
 
+  # GET method to retrieve all File objects
   def get(self, request):
-    detail = [ {"id": detail.id, "file": detail.file} for detail in File.objects.all()]
-    return Response(detail)
+    # A list of dictionaries containing the id and file URL of each File object
+    fileDetail = [{"id": detail.id, "file": detail.file.url, "filename": detail.file.name} for detail in File.objects.all()]
+    return Response(fileDetail)
 
+  # POST method to upload a new file
   def post(self, request):
+    # Create a serializer instance with the request data
     serializer = FileSerializer(data=request.data)
+
+    # Check if the data is valid
     if serializer.is_valid(raise_exception=True):
-      serializer.save()
+      serializer.save()  # Save the new File object to the database
       return Response(serializer.data)
-      
+
+  # DELETE method to delete a File object by its primary key (pk)
   def delete(self, request, pk):
     try:
-      react_object = File.objects.get(pk=pk)
-      react_object.delete()
+      react_object = File.objects.get(pk=pk)  # Retrieve the File object to be deleted
+      react_object.delete()  # Delete the object from the database
       return Response(status=status.HTTP_204_NO_CONTENT) 
     except File.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
+

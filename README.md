@@ -18,38 +18,42 @@ System wykrywający plagiaty w kodzie źródłowym:
 
 Jesli chcemy, żeby środowisko dobrze nam śmigało, to:
 
-- instalujemy gita na swojej maszynie
-- pobieramy i instalujemy Pythona 3.13.1 na swojej maszynie <br>
+- Instalujemy gita na swojej maszynie,
+- Pobieramy i instalujemy Python 3.13.1 na swojej maszynie, <br>
   _tu warto zaznaczyć, żeby dodał environment variables do path w systemie_
-- tworzymy nowy pusty folder
-- klonujemy repo z githuba: <br>
+- Pobieramy i instalujemy Node.js v20.15.0 bądż wyższą na swojej maszynie, <br>
+- Tworzymy nowy pusty folder,
+- Klonujemy repo z githuba: <br>
   `git clone https://github.com/PikkiKaju/Projekt_Inzynieria_Oprogramowania` <br>
-- tworzymy wirtualne środowisko (venv) Pythona w tym folderze poprzez pobranego Python'a: <br>
+- Tworzymy wirtualne środowisko (venv) Pythona w tym folderze poprzez pobranego Python'a: <br>
   `python -m venv "pełna ścieżka do folderu"` <br>
-  ew. korzystamy z IDE (jak np. VS Code), żeby nam to zrobiło z odpowiednią wersją Pythona jesli mamy ich kilka
-- aktywujemy venv: <br>
+  ew. korzystamy z IDE (jak np. VS Code), żeby nam to zrobiło z odpowiednią wersją Pythona jesli mamy ich kilka,
+- Aktywujemy venv: <br>
   `.venv\Scripts\activate`
-- instalujemy Django i wymagane biblioteki <br>
+- Instalujemy Django i wymagane biblioteki <br>
   `pip install -r backend/requirements.txt`
+- Tworzymy migracje w django, które utworzą nam baze danych i inne struktury: <br>
+  `python manage.py backend/makemigrations`
+  `python manage.py backend/migrate`
+- Instalujemy Reacta i wymagane biblioteki node'a <br>
+  `npm install`
 
-Teraz powinniśmy mieć aktywne venv i doinstalowane wszystko co potrzebne, żeby Python działał w naszym projekcie.
+Teraz powinniśmy mieć aktywne venv i doinstalowane wszystko co potrzebne, żeby Python i React działały w naszym projekcie.
 
 ### Jak wlączyć serwer backendowy:
 
-Żeby odpalić lokalny serwer backendowy zrobiony za pomocą Django:
+Żeby włączyć lokalny serwer backendowy zrobiony za pomocą Django:
 
-- włączamy serwer: <br>
+- Włączamy serwer: <br>
   `py backend/manage.py runserver`
-- wchodzimy w przeglądarce na `localhost:8000` (domyślny port to 8000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
+- Wchodzimy w przeglądarce na `localhost:8000` (domyślny port to 8000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
 
 ### Jak wlączyć aplikację frontendową:
 
-Żeby włączyć frontend zriobiony w React'cie, to musimy włączyć lokalny runtime Node'a:
+Żeby włączyć frontend zriobiony w React'cie, to musimy włączyć lokalny serwer Reacta:
 
-- przechodzimy do folderu z Reactem: <br>
-  `cd /backend/frontend`
-- instalujemy biblioteki Node'a:
-  `npm install`
-- włączamy aplikację React'ową: <br>
+- Włączamy aplikację Reactową: <br>
   `npm start`
-- wchodzimy w przeglądarce na `localhost:3000` (domyślny port to 3000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
+- Wchodzimy w przeglądarce na `localhost:3000` (domyślny port to 3000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
+
+##### Więcej informacji np. odnośnie API w django rest framework jest w docs/api
