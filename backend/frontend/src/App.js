@@ -171,6 +171,44 @@ class App extends React.Component {
         alert("Nie udało się usunąć pliku");
       });
   };
+  
+  // Handler function to upload the selected file to the server for the HDHGN to analyze
+  handleFileForHDHGN = (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+    const file = this.state.file; // Get the file from state
+    
+    // Check if a file is selected
+    if (file === null) {
+      alert("Wprowadź plik do wysłania");
+      return;
+    }
+
+    // Create a new FormData object
+    const formData = new FormData(); 
+    formData.append("file", file); // Append the file to the FormData
+    formData.append("filename", file.name); // Append the filename to the FormData
+
+    // Send a POST request to the server with the file data
+    axios
+      .post("http://localhost:8000/analyze/", formData, {
+        // API endpoint for file upload
+        headers: {
+          "Content-Type": "multipart/form-data", // Set content type for file upload
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        
+        // Clear the file state after successful upload
+        this.setState({
+          file: null,
+        });
+      })
+      .catch((err) => {
+        console.error("Error uploading file: ", err);
+        alert("Nie udało się wysłać pliku");
+      });
+  };
 
   // Render method to display the component UI
   render() {
@@ -196,15 +234,15 @@ class App extends React.Component {
 
         <br></br>
 
-        {/* Form for uploading files */}
-        <form onSubmit={this.handleFileUpload}>
+        {/* Form for uploading files to analyze by HDHGN*/}
+        <form onSubmit={this.handleFileForHDHGN}>
           <div>
             <div>
-              <span>Plik do backendu</span>
+              <span>Plik z kodem do porównania</span>
             </div>
             <input type="file" name="file" onChange={this.handleFileChange} />
           </div>
-          <button type="submit">Prześlij plik</button>
+          <button type="submit">Prześlij plik do sprawdzenia</button>
         </form>
 
         <hr />
