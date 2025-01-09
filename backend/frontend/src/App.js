@@ -2,16 +2,27 @@ import React from "react";
 import axios from "axios";
 
 import "./App.css";
+import Header from './Components/Header.js'
+import FileUploader from './Components/FileUploader.js'
+import SendFiles from './Components/SendFiles.js'
+import CodeDisplay from './Components/CodeDisplay.js'
+import ChangeFilesButton from "./Components/ChangeFilesButton.js";
+import Scroll from "./Components/Scroll.js";
+import DropDown from './Components/DropDown.js'
 
 // Main React component for the application
 class App extends React.Component {
+  
   // Initialize component state
   state = {
     textDetails: [], // Array to store text data retrieved from the server
     fileDetails: [], // Array to store file data retrieved from the server
     inputText: "", // Input string from the user
-    file: null, // File selected by the user for upload
+    files: [], // File selected by the user for upload
+    activeTab: 2, // Active tab
+    displayedFile: "", // File to display, chosen by the user from the uploaded files
   };
+
 
   // Function to fetch text data from the backend API endpoint
   getTextData = () => {
@@ -48,11 +59,11 @@ class App extends React.Component {
   };
 
   // Lifecycle method called when the component mounts
-  componentDidMount() {
-    // Fetch initial data from the backend when the component mounts
-    this.getTextData();
-    this.getFileData();
-  }
+  //componentDidMount() {
+    //Fetch initial data from the backend when the component mounts
+    //this.getTextData();
+    //this.getFileData();
+  //}
 
   // Handler function to update the input text state
   handleInput = (e) => {
@@ -64,27 +75,34 @@ class App extends React.Component {
 
   // Handler function to update the file state when a file is selected
   handleFileChange = (e) => {
-    // Store the selected file in state
-    this.setState({
-      file: e.target.files[0],
-    });
+    // Store the selected files in state
+    this.setState(prevState => ({
+      files: [...prevState.files, ...Array.from(e.target.files)]
+    }));
+  };
+
+  handleFileRemove = (fileName) => {
+    this.setState(prevState => ({files: prevState.files.filter((file) => file.name !== fileName)}))
   };
 
   // Handler function to upload the selected file to the server
   handleFileUpload = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-    const file = this.state.file; // Get the file from state
+    const files = this.state.files; // Get the file from state
     
     // Check if a file is selected
-    if (file === null) {
+    if (!files || files.length === 0) {
       alert("Wprowadź plik do wysłania");
       return;
     }
 
     // Create a new FormData object
     const formData = new FormData(); 
-    formData.append("file", file); // Append the file to the FormData
-    formData.append("filename", file.name); // Append the filename to the FormData
+
+    files.forEach((file, index) => {
+      formData.append(`files[${index}]`, file); // Append the files to the FormData
+      formData.append(`filenames[${index}]`, file.name); // Append the filename to the FormData
+    });
 
     // Send a POST request to the server with the file data
     axios
@@ -99,13 +117,15 @@ class App extends React.Component {
         this.getFileData(); 
         // Clear the file state after successful upload
         this.setState({
-          file: null,
+          files: [],
         });
       })
       .catch((err) => {
         console.error("Error uploading file: ", err);
         alert("Nie udało się wysłać pliku");
       });
+
+    this.switchTab(2);
   };
 
   // Handler function to submit text data to the server
@@ -172,70 +192,208 @@ class App extends React.Component {
       });
   };
 
+  // Function to switch tabs
+  switchTab = (tabNumber) => {
+    this.setState({ activeTab: tabNumber });
+  };
+
+  BackToHome = () => { // Returns to tab 1 
+    this.switchTab(1);
+  };
+
+  HandleDisplayFile = (e) => { // Changes diaplayed file depending of the users choice in dropdown
+    this.setState({ displayedFile: e.target.value });
+  };
+
   // Render method to display the component UI
   render() {
+
+    const { activeTab } = this.state;
+
     return (
       <div className="container">
-        {/* Form for submitting text input */}
-        <form onSubmit={this.handleTextSubmit}>
+        {activeTab === 1 ? ( // tab1 --------------------------------------------------------------------------------------------------
           <div>
-            <div>
-              <span id="basic-addon1">Tekst do backendu</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Wpisz tekst"
-              value={this.state.inputText}
-              name="inputText"
-              onChange={this.handleInput}
-            />
+            <Header/>
+            {/* Form for submitting text input 
+            <form onSubmit={this.handleTextSubmit}>
+              <div>
+                <div>
+                  <span id="basic-addon1">Tekst do backendu</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Wpisz tekst"
+                  value={this.state.inputText}
+                  name="inputText"
+                  onChange={this.handleInput}
+                />
+              </div>
+
+              <button type="submit">Prześlij tekst</button>
+            </form>*/}
+
+            <br></br>
+            <FileUploader files={this.state.files} onFileChange={this.handleFileChange} onFileRemove={this.handleFileRemove}/>
+            {/* Form for uploading files */}
+            <form onSubmit={this.handleFileUpload}>
+              <SendFiles/>
+            </form>            
           </div>
 
-          <button type="submit">Prześlij tekst</button>
-        </form>
 
-        <br></br>
 
-        {/* Form for uploading files */}
-        <form onSubmit={this.handleFileUpload}>
-          <div>
-            <div>
-              <span>Plik do backendu</span>
+        ):( // tab2 ------------------------------------------------------------------------------------------------------------
+          <div style={{height: '100vh', textAlign: 'center', }}>
+            {/* Label with measure of similarity */}
+            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', height: '20%'}}>
+            <button style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '40px',
+                  cursor: 'pointer',
+                  paddingLeft: '20px',
+                  color: '#6a64ae',
+                }} onClick={this.BackToHome}>
+                ⮌
+                </button>
+              <h1 style={{margin: '40px 0px 10px 0px', color: 'white', position: 'absolute', left: '50%', transform: 'translateX(-50%)'}}>Podobieństwo 50%</h1>
             </div>
-            <input type="file" name="file" onChange={this.handleFileChange} />
-          </div>
-          <button type="submit">Prześlij plik</button>
-        </form>
+            
+            <div style={{display: 'flex', height: '65%', justifyContent: 'center'}}>
+              <CodeDisplay code={"import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                      import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
+                                  import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
+                                  import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj"}/>
 
-        <hr />
+              {/* Arrows in the middle to scroll both displays */}                
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '80%', marginTop: '20px' }}> 
+                <Scroll icon = "⮝"/>
+                <Scroll icon = "⮟"/>
+              </div>
+              <CodeDisplay  code={"import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                      import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
+                                  import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
+                                  import matplotlib python code abcd\
+                                  m = 1\
+                                  \
+                                  for _ in range(5):\
+                                  \
+                                    if (m == 0 or m !=2):\
+                                    \
+                                      kjscd bLSJKHadsjkcnajkdc\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
+                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj"}/>
 
-        {/* Display text data retrieved from the server */}
-        {this.state.textDetails.map((detail) => (
-          <div key={detail.id}>
-            <div className="card">
-              <p>Tekst z backendu nr {detail.id}</p>
-              <p> {detail.inputText} </p>
-              {/* Form for deleting an item */}
-              <form onSubmit={(e) => this.handleDeleteText(e, detail.id)}>
-                <button type="submit">Usuń tekst</button>
-              </form>
+
+              {/* Display text data retrieved from the server */}
+              {/*{this.state.textDetails.map((detail) => (
+                <div key={detail.id}>
+                  <div className="card">
+                    <p>Tekst z backendu nr {detail.id}</p>
+                    <p> {detail.inputText} </p>*/}
+                    {/* Form for deleting an item */}
+                    {/*<form onSubmit={(e) => this.handleDeleteText(e, detail.id)}>
+                      <button type="submit">Usuń tekst</button>
+                    </form>
+                  </div>
+                </div>
+              ))}*/}
+
+              {/* Display file data retrieved from the server */}
+              {/*{this.state.fileDetails.map((detail) => (
+                <div key={detail.id}>
+                  <div className="card">
+                    <p>Plik z backendu nr {detail.id}</p>
+                    <p> {detail.filename} </p>*/}
+                    {/* Form for deleting a file */}
+                    {/*<form onSubmit={(e) => this.handleDeleteFile(e, detail.id)}>
+                      <button type="submit">Usuń plik</button>
+                    </form>
+                  </div>
+                </div>
+              ))} */}
+            </div>
+            <div style={{display: 'flex', justifyContent: 'center', }}>
+            <div style={{
+                  display: 'flex',
+                  width: '40%',
+                  justifyContent: 'center',
+                  padding: '10px',
+                  margin: '0px 40px 0px 0px',
+              }}>
+                <ChangeFilesButton/> {/* Buttons to change code to compare */}
+              </div>
+              <div style={{
+                  display: 'flex',
+                  width: '40%',
+                  justifyContent: 'center',
+                  padding: '10px',
+                  margin: '0px 0px 0px 40px', 
+              }}>
+              <DropDown value={this.state.displayedFile}
+                        onChange={(e) => this.HandleDisplayFile(e)}
+                        options={['abcd.py', 'efgh.py', 'ijkl.py']}
+              />
+              </div>
             </div>
           </div>
-        ))}
-
-        {/* Display file data retrieved from the server */}
-        {this.state.fileDetails.map((detail) => (
-          <div key={detail.id}>
-            <div className="card">
-              <p>Plik z backendu nr {detail.id}</p>
-              <p> {detail.filename} </p>
-              {/* Form for deleting a file */}
-              <form onSubmit={(e) => this.handleDeleteFile(e, detail.id)}>
-                <button type="submit">Usuń plik</button>
-              </form>
-            </div>
-          </div>
-        ))}
+        )}
       </div>
     );
   }
