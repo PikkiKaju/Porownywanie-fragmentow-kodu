@@ -58,12 +58,12 @@ class App extends React.Component {
       });
   };
 
-  // Lifecycle method called when the component mounts
-  //componentDidMount() {
+  //Lifecycle method called when the component mounts
+  componentDidMount() {
     //Fetch initial data from the backend when the component mounts
     //this.getTextData();
     //this.getFileData();
-  //}
+  }
 
   // Handler function to update the input text state
   handleInput = (e) => {
@@ -76,9 +76,7 @@ class App extends React.Component {
   // Handler function to update the file state when a file is selected
   handleFileChange = (e) => {
     // Store the selected files in state
-    this.setState(prevState => ({
-      files: [...prevState.files, ...Array.from(e.target.files)]
-    }));
+    this.setState(prevState => ({files: [...prevState.files, ...Array.from(e.target.files)]}));
   };
 
   handleFileRemove = (fileName) => {
@@ -89,7 +87,6 @@ class App extends React.Component {
   handleFileUpload = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
     const files = this.state.files; // Get the file from state
-    
     // Check if a file is selected
     if (!files || files.length === 0) {
       alert("Wprowadź plik do wysłania");
@@ -97,12 +94,12 @@ class App extends React.Component {
     }
 
     // Create a new FormData object
-    const formData = new FormData(); 
+    const formData = new FormData();
 
-    files.forEach((file, index) => {
-      formData.append(`files[${index}]`, file); // Append the files to the FormData
-      formData.append(`filenames[${index}]`, file.name); // Append the filename to the FormData
+    files.forEach((file) => {
+        formData.append("files", file); /// Append the files to the FormData
     });
+
 
     // Send a POST request to the server with the file data
     axios
@@ -116,16 +113,13 @@ class App extends React.Component {
         // Fetch updated data from the backend after successful upload
         this.getFileData(); 
         // Clear the file state after successful upload
-        this.setState({
-          files: [],
-        });
+
+        this.switchTab(2);
       })
       .catch((err) => {
         console.error("Error uploading file: ", err);
         alert("Nie udało się wysłać pliku");
       });
-
-    this.switchTab(2);
   };
 
   // Handler function to submit text data to the server
@@ -198,11 +192,19 @@ class App extends React.Component {
   };
 
   BackToHome = () => { // Returns to tab 1 
+    this.setState({
+      files: [],
+    });
+    // to do: Remove files
     this.switchTab(1);
   };
 
-  HandleDisplayFile = (e) => { // Changes diaplayed file depending of the users choice in dropdown
+  HandleDisplayFile = (e) => { // Changes displayed file depending of the users choice in dropdown
     this.setState({ displayedFile: e.target.value });
+  };
+
+  getFileNames = () => {
+    return this.state.files.map(file => file.name); // Returns files names
   };
 
   // Render method to display the component UI
@@ -261,42 +263,7 @@ class App extends React.Component {
             </div>
             
             <div style={{display: 'flex', height: '65%', justifyContent: 'center'}}>
-              <CodeDisplay code={"import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                      import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
-                                  import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
-                                  import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj"}/>
+              <CodeDisplay code={"rdyfguijop"}/>
 
               {/* Arrows in the middle to scroll both displays */}                
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '80%', marginTop: '20px' }}> 
@@ -388,7 +355,7 @@ class App extends React.Component {
               }}>
               <DropDown value={this.state.displayedFile}
                         onChange={(e) => this.HandleDisplayFile(e)}
-                        options={['abcd.py', 'efgh.py', 'ijkl.py']}
+                        options={this.getFileNames()}
               />
               </div>
             </div>
