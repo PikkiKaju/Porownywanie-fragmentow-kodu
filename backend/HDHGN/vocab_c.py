@@ -58,10 +58,9 @@ class Vocab:
 
         tokens = {"types": [], "edge_types": [], "labels": []}
         for file_path in paths_file:
-            file = open(file_path[3:-1], encoding="utf-8")
-            code = file.read()
+            file_name = file_path[3:-1]
             try:
-                root = c_parser.CParser().parse(code)
+                root = parse_file(file_name, use_cpp=True, cpp_path="clang", cpp_args=["-E", r"-Iutilities/fake_libc_include"])
                 index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(root, 0, 0)
                 for (type, feature) in zip(types, features):
                     if type in tokens:
@@ -74,7 +73,6 @@ class Vocab:
             except c_parser.ParseError:
                 print(f"Syntax error in file: {file_path} while building C vocabulary. File will be ignored.")
                 pass
-            file.close()
 
         vocab = {}
         for f in tokens:

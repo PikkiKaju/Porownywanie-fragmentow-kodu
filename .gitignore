@@ -3,6 +3,7 @@
 # environment
 .venv
 .vscode
+.vs
 
 backend/app/__pycache__
 backend/app/migrations/__pycache__
