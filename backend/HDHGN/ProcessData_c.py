@@ -33,7 +33,7 @@ def splitdata_c(source_files_path: str):
             if file_name.endswith('.c'):
                 file_path = os.path.join(root, file_name)
                 try:
-                    parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + os.path.abspath("./utilities/fake_libc_include")])
+                    parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "./utilities/fake_libc_include", "-std=c99"])
                     files_paths.append('../' + file_path)
                     labels.append(root)
                 except c_parser.ParseError:

@@ -105,7 +105,7 @@ class Vocab:
         tokens = {"types": [], "edge_types": [], "labels": []}
         for file_path in paths_file:
             try:
-                root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + abspath("./utilities/fake_libc_include")])
+                root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "./utilities/fake_libc_include", "-std=c99"])
                 index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(root, 0, 0)
                 for (type, feature) in zip(types, features):
                     if type in tokens:

@@ -104,11 +104,10 @@ def move_files_c(source_path, new_path, num_files=11):
                 # Read the file and filter out lines with #include
                 with open(old_path, 'r', encoding='utf-8') as file:
                     lines = file.readlines()
-                filtered_lines = [line for line in lines if not line.strip().startswith('#include')]
-                
+
                 # Write the filtered content to the new file
                 with open(new_file_path, 'w', encoding='utf-8') as new_file:
-                    new_file.writelines(filtered_lines)
+                    new_file.writelines(lines)
 
 
 if __name__ == "__main__":
