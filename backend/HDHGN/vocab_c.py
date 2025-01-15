@@ -2,6 +2,7 @@ import ast
 from pycparser import c_parser, c_ast, parse_file
 from collections import Counter
 import json
+from os.path import abspath
 
 from utilities.utils import pre_walk_tree_c
 
@@ -60,7 +61,7 @@ class Vocab:
         for file_path in paths_file:
             file_name = file_path[3:-1]
             try:
-                root = parse_file(file_name, use_cpp=True, cpp_path="clang", cpp_args=["-E", r"-Iutilities/fake_libc_include"])
+                root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + abspath("./utilities/fake_libc_include")])
                 index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(root, 0, 0)
                 for (type, feature) in zip(types, features):
                     if type in tokens:

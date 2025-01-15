@@ -23,8 +23,11 @@ backend/frontend/coverage
 
 # production
 backend/frontend/build
-backend/HDHGN/data/txt_c_files/*.txt
-backend/HDHGN/data/txt_python_files/*.txt
+
+# training files
+backend/HDHGN/data/**/*.txt
+backend/HDHGN/data/**/*.c
+backend/HDHGN/data/**/*.py
 
 # misc
 .DS_Store
