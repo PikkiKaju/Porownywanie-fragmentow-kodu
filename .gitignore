@@ -8,6 +8,7 @@
 backend/app/__pycache__
 backend/app/migrations/__pycache__
 backend/backend/__pycache__
+backend/HDHGN/utilities/__pycache__
 
 # local
 backend/media/uploads
@@ -28,6 +29,7 @@ backend/frontend/build
 backend/HDHGN/data/**/*.txt
 backend/HDHGN/data/**/*.c
 backend/HDHGN/data/**/*.py
+backend/HDHGN/data/**/*.json
 
 # misc
 .DS_Store
