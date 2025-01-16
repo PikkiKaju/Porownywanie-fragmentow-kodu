@@ -1,3 +1,4 @@
+import argparse
 import torch
 import ast
 
@@ -5,6 +6,20 @@ from models.HDHGN import HDHGN
 from MyDataset import HDHGData
 from utilities.vocab import Vocab
 from utilities.utils import pre_walk_tree
+
+
+# Initialize argument parser
+parser = argparse.ArgumentParser()
+
+# Adding optional arguments
+parser.add_argument("-mp", "--model_path", help = "Path to the pre-trained model", type = str, default = "work_dir/HDHGN/HDHGN.pt")
+parser.add_argument("-vp", "--vocab_path", help = "Path to the vocabulary file", type = str, default = "data/vocab4ast.json")
+parser.add_argument("-fp", "--file_path", help = "Path to the file to be predicted", type = str, default = "data/additional/file_to_test.py")
+
+
+# Read arguments from command line
+args = parser.parse_args()
+
 
 def predict(file_path: str, model_path: str, vocab_path: str):
     """
@@ -60,12 +75,15 @@ def predict(file_path: str, model_path: str, vocab_path: str):
     
     # Decode prediction
     label = vocab.vocab["labels"].id2word[prediction.item()]
-    return label
+    probabilities = torch.nn.functional.softmax(output, dim=-1)
+    return output, probabilities, label
 
 if __name__ == '__main__':
-    model_path = "work_dir/HDHGN/HDHGN.pt"
-    vocab_path = "data/vocab4ast.json"
-    file_to_test = "data/additional/file_to_test.py"
+    model_path = args.model_path
+    vocab_path = args.vocab_path
+    file_to_test = args.file_path
     print("Making predictions...")
-    label = predict(file_to_test, model_path, vocab_path)
+    output, probabilities, label = predict(file_to_test, model_path, vocab_path)
+    print(f"The output for the file is: {output}")
+    print(f"The probabilities for each label are: {probabilities}")
     print(f"The predicted label for the file is: {label}")

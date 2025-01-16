@@ -1,5 +1,17 @@
 import os
+import argparse
 import shutil
+
+# Initialize argument parser
+parser = argparse.ArgumentParser()
+
+# Adding optional arguments
+parser.add_argument("-n", "--num_files", help="Number of files to create for each file in the source directory", type=int, default=10)
+parser.add_argument("-dp", "--directory_python", help="Path to the directory containing the Python files", type=str, default="data/txt_python_files")
+parser.add_argument("-dc", "--directory_c", help="Path to the directory containing the C files", type=str, default="data/txt_c_files")
+
+# Read arguments from command line
+args = parser.parse_args()
 
 def change_files_extensions(directory):
     """Changes file extensions from .txt to .py in a given directory.
@@ -112,10 +124,10 @@ def move_files_c(source_path, new_path, num_files=11):
 
 
 if __name__ == "__main__":
-    num_files = 11
+    num_files = args.num_files + 1
+    source_path_python = args.directory_python
+    new_path_python = args.directory_python
 
-    source_path_python = "data/txt_python_files"
-    new_path_python = "data/python_files"
     change_files_extensions(source_path_python)
     move_files(source_path_python, new_path_python, num_files=num_files)
     print(f"Python file extensions changed in {source_path_python} to .py and saved in {new_path_python} in separate folders.")
