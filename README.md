@@ -56,4 +56,4 @@ Teraz powinniśmy mieć aktywne venv i doinstalowane wszystko co potrzebne, żeb
   `npm start`
 - Wchodzimy w przeglądarce na `localhost:3000` (domyślny port to 3000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
 
-##### Więcej informacji np. odnośnie API w django rest framework jest w docs/api
+#### Więcej informacji np. odnośnie API i HDHGN jest w /docs

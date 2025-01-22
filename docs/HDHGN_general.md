@@ -9,13 +9,13 @@ Pliki zawarte tutaj służą do przeprocesowania plikow z kodem źródłowym z n
 ## Wymagania
 
 Oryginalnie w artykule wszystko zostało przeprowadzone na Ubuntu 18.04.6 LTS i Pythonie 3.8.
-Nasz projekt korzysta jednak z Pythona 3.13 (najnowszego na obecny czas), aczkolwiek niestety ta wersja nie jest kompatybilna z PyTorchem i innymi wymaganymi bibliotekami, więc tutaj zastosowany został najnowszy możliwy Python 3.11.
+Nasz projekt korzysta jednak z Pythona 3.13 (najnowszego na obecny czas), aczkolwiek niestety ta wersja nie jest kompatybilna z PyTorchem i innymi wymaganymi bibliotekami, więc tutaj zastosowany został **najnowszy możliwy Python 3.11**.
 
 Model zaimplementowany jest za pomocą [PyTorch](https://pytorch.org/docs/2.5/) 2.5.1 i [torch geometric 2.6.1](https://pytorch-geometric.readthedocs.io/en/2.6.1/index.html). Model trenuje się albo poprzez CPU albo poprzez rdzenie CUDA w GPU NVIDIA. W moim przypadku było to robione za pomocą CUDA na karcie GTX 1660.
 Aby korzystać z rdzeni CUDA potrzebny jest CUDA toolkit, który trzeba zainstalować w odpowiedniej wersji i dobrany do swojego systemu. W moim przypadku był to toolkit CUDA w wersji 12.4 (najnowsza wersja, którą obsługuje PyTorch)
 
-Wymagane biblioteki są wymienione w pliku requirements.txt, z tym że całość PyTorch'a najlepiej zainstalować ręcznie, (te biblioteki są w requirements.txt zakomentowane). Poniżej jak to zrobić:
-`pip install torch==2.5.1+cu124`
+Wymagane biblioteki są wymienione w pliku `backend/HDHGN/requirements.txt`, z tym że całość PyTorch'a najlepiej zainstalować ręcznie, (te biblioteki są w requirements.txt zakomentowane). Poniżej jak to zrobić:
+`pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124`
 `pip install torch-geometric==2.6.1`
 `pip install torch-scatter -f https://pytorch-geometric.com/whl/torch-2.5.1+cu124.html`
 
