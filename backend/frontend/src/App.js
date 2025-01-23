@@ -22,7 +22,7 @@ class App extends React.Component {
     //fileDetails: [], // Array to store file data retrieved from the server
     fileDetails: [
       { id: 1, name: "file1.txt", content: 
-        "This is file 1 content hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhh hhhhhhhhh hhhhhhhhhhhhhhh hhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh" },
+        "This is file 1 content hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhh hhhhhhhhh hhh ihbbbbbbbbbbbbbbbbbbbbbb ybiiiiiiiiiiiiiiii iyhvhhhhhhhh edtcyffffffffffff d6tryyyyyyyyyyyyyyyyyyyyyy vhiyaiudbai aes gfousefouarguoyef g ief ougy fuyss pywegfhou Gfuy GSfcfouy Souv zgsdeupf gsup gfpispfy espyf spiv gzpsiufhpSUIfh hhhhhhhhhhhh hhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh" },
       { id: 2, name: "file2.txt", content: "This is file 2 content" },
       { id: 3, name: "file3.txt", content: "This is file 3 content" },
       { id: 4, name: "file4.txt", content: "This is file 4 content" },
@@ -349,14 +349,14 @@ class App extends React.Component {
             </form>
           </div>
         ) : ( // tab2
-          <div style={{ height: '100vh', textAlign: 'center' }}>
+          <div style={{ height: '100vh', textAlign: 'center' , width: '100%'}}>
           {/* Label with measure of similarity */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 width: '100%',
-                height: '20%',
+                height: '10%',
               }}
             >
               <button
@@ -384,10 +384,18 @@ class App extends React.Component {
                 Podobieństwo 50%
               </h1>
             </div>
+            <div style={{ display: 'flex', marginTop: '40px'}}>
+              <div style={{display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae'}}>
+                ORYGINALNY KOD
+              </div>
+              <div style={{display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae'}}>
+                KOD Z WYKRYTYM PODOBIEŃSTWEM
+              </div>
+            </div>
   
-            <div style={{ display: 'flex', height: '65%', justifyContent: 'center' }}>
-              {/* Left Box (Content from fileDetails) */}
-              <CodeDisplay ref={this.leftBoxRef} code={currentFile?.content || "No content available"} />
+            <div style={{ display: 'flex', height: '65%',  justifyContent: 'center'}}>
+              {/* Left Box (Content from fileDetails) - was moved to the right*/}
+              <CodeDisplay ref={this.rightBoxRef} code={fileContentToDisplay} />
               
               <div
                 style={{
@@ -402,8 +410,8 @@ class App extends React.Component {
                 <Scroll icon="⮟" onClick={this.scrollDown} />
               </div>
   
-              {/* Right Box (Content from user selected file) */}
-              <CodeDisplay ref={this.rightBoxRef} code={fileContentToDisplay} />
+              {/* Right Box (Content from user selected file)  - was moved to the left*/}
+              <CodeDisplay ref={this.leftBoxRef} code={currentFile?.content || "No content available"} />
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -416,11 +424,10 @@ class App extends React.Component {
                   margin: '0px 40px 0px 0px',
                 }}
               >
-                <ChangeFilesButton
-                  onPreviousFile={this.handlePreviousFile}
-                  onNextFile={this.handleNextFile}
-                  currentFileIndex={this.state.currentFileIndex}
-                  totalFiles={this.state.fileDetails.length}
+                <DropDown
+                value={this.state.displayedFile} // Selected file name
+                onChange={this.HandleDisplayFile} // Updates displayedFile
+                options={this.state.uploadedFilesContent.map(file => file.name)} // File names as options
                 />
               </div>
               <div
@@ -432,10 +439,11 @@ class App extends React.Component {
                   margin: '0px 0px 0px 40px',
                 }}
               >
-                <DropDown
-                value={this.state.displayedFile} // Selected file name
-                onChange={this.HandleDisplayFile} // Updates displayedFile
-                options={this.state.uploadedFilesContent.map(file => file.name)} // File names as options
+                <ChangeFilesButton
+                  onPreviousFile={this.handlePreviousFile}
+                  onNextFile={this.handleNextFile}
+                  currentFileIndex={this.state.currentFileIndex}
+                  totalFiles={this.state.fileDetails.length}
                 />
               </div>
             </div>
