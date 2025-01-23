@@ -112,14 +112,7 @@ def move_files_c(source_path, new_path, num_files=11):
             os.makedirs(new_folder_path, exist_ok=True)
             for i in range(1, num_files + 1):
                 new_file_path = os.path.join(new_folder_path, f"{i}_{new_filename}")
-                #shutil.copy2(old_path, new_file_path)
-                # Read the file and filter out lines with #include
-                with open(old_path, 'r', encoding='utf-8') as file:
-                    lines = file.readlines()
-
-                # Write the filtered content to the new file
-                with open(new_file_path, 'w', encoding='utf-8') as new_file:
-                    new_file.writelines(lines)
+                shutil.copy2(old_path, new_file_path)
 
 
 if __name__ == "__main__":

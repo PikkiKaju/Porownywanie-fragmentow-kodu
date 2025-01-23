@@ -50,9 +50,6 @@ backend/HDHGN/data/**/*.py
 backend/HDHGN/data/**/*.json
 backend/HDHGN/data/**/*.pt
 
-# model files
-backend/HDHGN/work_dir
-
 # misc
 .DS_Store
 .env.local
