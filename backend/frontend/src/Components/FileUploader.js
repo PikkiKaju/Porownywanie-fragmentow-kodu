@@ -21,6 +21,7 @@ const FileUploader = ({ files, onFileChange, onFileRemove }) => {
             multiple
             style={{ display: 'none' }}
             onChange={onFileChange}
+            accept=".txt" // Only allow .txt files
           />
         </label>
       </div>

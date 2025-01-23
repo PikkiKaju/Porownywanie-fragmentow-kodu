@@ -9,18 +9,53 @@ import CodeDisplay from './Components/CodeDisplay.js'
 import ChangeFilesButton from "./Components/ChangeFilesButton.js";
 import Scroll from "./Components/Scroll.js";
 import DropDown from './Components/DropDown.js'
+import { createRef } from "react";
 
 // Main React component for the application
 class App extends React.Component {
   
   // Initialize component state
-  state = {
-    textDetails: [], // Array to store text data retrieved from the server
-    fileDetails: [], // Array to store file data retrieved from the server
+  constructor(props) {
+    super(props);
+    this.state = {
+      textDetails: [], // Array to store text data retrieved from the server
+    //fileDetails: [], // Array to store file data retrieved from the server
+    fileDetails: [
+      { id: 1, name: "file1.txt", content: 
+        "This is file 1 content hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhh hhhhhhhhh hhhhhhhhhhhhhhh hhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh" },
+      { id: 2, name: "file2.txt", content: "This is file 2 content" },
+      { id: 3, name: "file3.txt", content: "This is file 3 content" },
+      { id: 4, name: "file4.txt", content: "This is file 4 content" },
+      { id: 5, name: "file5.txt", content: "This is file 5 content" },
+    ], // Hardcoded files for demonstration
     inputText: "", // Input string from the user
     files: [], // File selected by the user for upload
-    activeTab: 2, // Active tab
+    currentFileIndex: 0, // Track which file is being shown
+    activeTab: 1, // Active tab
     displayedFile: "", // File to display, chosen by the user from the uploaded files
+    uploadedFilesContent: [], // Array to store content of uploaded files
+    };
+
+    // Create refs for the left and right CodeDisplay components
+    this.leftBoxRef = createRef();
+    this.rightBoxRef = createRef();
+  }
+
+  scrollUp = () => {
+    this.scrollBothBoxes(-50); // Scroll up by 50px
+  };
+
+  scrollDown = () => {
+    this.scrollBothBoxes(50); // Scroll down by 50px
+  };
+
+  scrollBothBoxes = (scrollAmount) => {
+    if (this.leftBoxRef.current) {
+      this.leftBoxRef.current.scrollTop += scrollAmount;
+    }
+    if (this.rightBoxRef.current) {
+      this.rightBoxRef.current.scrollTop += scrollAmount;
+    }
   };
 
 
@@ -58,6 +93,10 @@ class App extends React.Component {
       });
   };
 
+  getFileNames = () => {
+    return this.state.fileDetails.map(file => file.name); // Returns files names
+  };
+
   //Lifecycle method called when the component mounts
   componentDidMount() {
     //Fetch initial data from the backend when the component mounts
@@ -75,51 +114,86 @@ class App extends React.Component {
 
   // Handler function to update the file state when a file is selected
   handleFileChange = (e) => {
-    // Store the selected files in state
-    this.setState(prevState => ({files: [...prevState.files, ...Array.from(e.target.files)]}));
+    const selectedFiles = Array.from(e.target.files);
+    
+    // Filter to ensure only .txt files are added
+    const txtFiles = selectedFiles.filter(file => file.type === 'text/plain');
+  
+    if (txtFiles.length === 0) {
+      alert("Tylko pliki .txt są dozwolone");
+    }
+  
+    // Update the state with only .txt files
+    this.setState(prevState => ({ files: [...prevState.files, ...txtFiles] }));
   };
 
   handleFileRemove = (fileName) => {
     this.setState(prevState => ({files: prevState.files.filter((file) => file.name !== fileName)}))
   };
 
+  handleNextFile = () => {
+    this.setState((prevState) => {
+      const nextIndex = (prevState.currentFileIndex + 1) % this.state.fileDetails.length; // Ensure only 5 files are navigable
+      return { currentFileIndex: nextIndex };
+    });
+  };
+  
+  handlePreviousFile = () => {
+    this.setState((prevState) => {
+      const prevIndex = (prevState.currentFileIndex - 1 + this.state.fileDetails.length) % this.state.fileDetails.length; // Wrap-around for hardcoded files
+      return { currentFileIndex: prevIndex };
+    });
+  };
+
   // Handler function to upload the selected file to the server
   handleFileUpload = (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    const files = this.state.files; // Get the file from state
-    // Check if a file is selected
+    e.preventDefault();
+    const { files } = this.state;
+  
     if (!files || files.length === 0) {
       alert("Wprowadź plik do wysłania");
       return;
     }
-
-    // Create a new FormData object
+  
     const formData = new FormData();
-
-    files.forEach((file) => {
-        formData.append("files", file); /// Append the files to the FormData
-    });
-
-
-    // Send a POST request to the server with the file data
+    files.forEach((file) => formData.append("files", file));
+  
     axios
       .post("http://localhost:8000/file/", formData, {
-        // API endpoint for file upload
-        headers: {
-          "Content-Type": "multipart/form-data", // Set content type for file upload
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => {
-        // Fetch updated data from the backend after successful upload
-        this.getFileData(); 
-        // Clear the file state after successful upload
-
-        this.switchTab(2);
+        // Read the file content after upload and save it to uploadedFilesContent
+        this.readFileContent(files);
+        this.switchTab(2);  // Switch to tab 2
       })
       .catch((err) => {
         console.error("Error uploading file: ", err);
         alert("Nie udało się wysłać pliku");
       });
+  };
+  
+  readFileContent = (files) => {
+    const fileContents = [];
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fileContents.push({ name: file.name, content: e.target.result });
+        // Update the state once all files are read
+        if (fileContents.length === files.length) {
+          this.setState(
+            {
+              uploadedFilesContent: fileContents,
+              displayedFile: fileContents[0]?.name || "", // Set the first file as default
+            },
+            () => {
+              console.log('Updated uploadedFilesContent:', this.state.uploadedFilesContent);
+            }
+          );
+        }
+      };
+      reader.readAsText(file);
+    });
   };
 
   // Handler function to submit text data to the server
@@ -199,164 +273,132 @@ class App extends React.Component {
     this.switchTab(1);
   };
 
-  HandleDisplayFile = (e) => { // Changes displayed file depending of the users choice in dropdown
-    this.setState({ displayedFile: e.target.value });
+  HandleDisplayFile = (event) => {
+    this.setState({ displayedFile: event.target.value });
   };
 
   getFileNames = () => {
+    return this.state.fileDetails.map(file => file.name); // Returns files names
+  };
+
+  getUserFileNames = () => {
     return this.state.files.map(file => file.name); // Returns files names
   };
 
   // Render method to display the component UI
   render() {
-
-    const { activeTab } = this.state;
-
+    const { activeTab, files, displayedFile, currentFileIndex, fileDetails, uploadedFilesContent } = this.state;
+    console.log("Uploaded Files Content: ", this.state.uploadedFilesContent);
+    // Get the content of the currently selected file for the left box
+    const currentFile = fileDetails[currentFileIndex]; // Get current file based on fileDetails
+    // Get the content of the currently selected file for the right box
+    const fileContentToDisplay = uploadedFilesContent.find(
+      (file) => file.name === displayedFile
+    )?.content || uploadedFilesContent[0]?.content || "No content available";
+    
     return (
       <div className="container">
-        {activeTab === 1 ? ( // tab1 --------------------------------------------------------------------------------------------------
+        {activeTab === 1 ? ( // tab1
           <div>
-            <Header/>
-            {/* Form for submitting text input 
-            <form onSubmit={this.handleTextSubmit}>
-              <div>
-                <div>
-                  <span id="basic-addon1">Tekst do backendu</span>
-                </div>
-                <input
-                  type="text"
-                  placeholder="Wpisz tekst"
-                  value={this.state.inputText}
-                  name="inputText"
-                  onChange={this.handleInput}
-                />
-              </div>
-
-              <button type="submit">Prześlij tekst</button>
-            </form>*/}
-
-            <br></br>
-            <FileUploader files={this.state.files} onFileChange={this.handleFileChange} onFileRemove={this.handleFileRemove}/>
-            {/* Form for uploading files */}
+            <Header />
+            <FileUploader
+              files={files}
+              onFileChange={this.handleFileChange}
+              onFileRemove={this.handleFileRemove}
+            />
             <form onSubmit={this.handleFileUpload}>
-              <SendFiles/>
-            </form>            
+              <SendFiles />
+            </form>
           </div>
-
-
-
-        ):( // tab2 ------------------------------------------------------------------------------------------------------------
-          <div style={{height: '100vh', textAlign: 'center', }}>
-            {/* Label with measure of similarity */}
-            <div style={{display: 'flex', justifyContent: 'space-between', width: '100%', height: '20%'}}>
-            <button style={{
+        ) : ( // tab2
+          <div style={{ height: '100vh', textAlign: 'center' }}>
+          {/* Label with measure of similarity */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                height: '20%',
+              }}
+            >
+              <button
+                style={{
                   background: 'none',
                   border: 'none',
                   fontSize: '40px',
                   cursor: 'pointer',
                   paddingLeft: '20px',
                   color: '#6a64ae',
-                }} onClick={this.BackToHome}>
+                }}
+                onClick={this.BackToHome}
+              >
                 ⮌
-                </button>
-              <h1 style={{margin: '40px 0px 10px 0px', color: 'white', position: 'absolute', left: '50%', transform: 'translateX(-50%)'}}>Podobieństwo 50%</h1>
+              </button>
+              <h1
+                style={{
+                  margin: '40px 0px 10px 0px',
+                  color: 'white',
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                }}
+              >
+                Podobieństwo 50%
+              </h1>
+            </div>
+  
+            <div style={{ display: 'flex', height: '65%', justifyContent: 'center' }}>
+              {/* Left Box (Content from fileDetails) */}
+              <CodeDisplay ref={this.leftBoxRef} code={currentFile?.content || "No content available"} />
+              
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  height: '80%',
+                  marginTop: '20px',
+                }}
+              >
+                <Scroll icon="⮝" onClick={this.scrollUp} />
+                <Scroll icon="⮟" onClick={this.scrollDown} />
+              </div>
+  
+              {/* Right Box (Content from user selected file) */}
+              <CodeDisplay ref={this.rightBoxRef} code={fileContentToDisplay} />
             </div>
             
-            <div style={{display: 'flex', height: '65%', justifyContent: 'center'}}>
-              <CodeDisplay code={"rdyfguijop"}/>
-
-              {/* Arrows in the middle to scroll both displays */}                
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '80%', marginTop: '20px' }}> 
-                <Scroll icon = "⮝"/>
-                <Scroll icon = "⮟"/>
-              </div>
-              <CodeDisplay  code={"import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                      import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
-                                  import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
-                                  import matplotlib python code abcd\
-                                  m = 1\
-                                  \
-                                  for _ in range(5):\
-                                  \
-                                    if (m == 0 or m !=2):\
-                                    \
-                                      kjscd bLSJKHadsjkcnajkdc\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj\
-                                  isudbclasjkcb asikdck;sbdc;kjdc hcbsduj"}/>
-
-
-              {/* Display text data retrieved from the server */}
-              {/*{this.state.textDetails.map((detail) => (
-                <div key={detail.id}>
-                  <div className="card">
-                    <p>Tekst z backendu nr {detail.id}</p>
-                    <p> {detail.inputText} </p>*/}
-                    {/* Form for deleting an item */}
-                    {/*<form onSubmit={(e) => this.handleDeleteText(e, detail.id)}>
-                      <button type="submit">Usuń tekst</button>
-                    </form>
-                  </div>
-                </div>
-              ))}*/}
-
-              {/* Display file data retrieved from the server */}
-              {/*{this.state.fileDetails.map((detail) => (
-                <div key={detail.id}>
-                  <div className="card">
-                    <p>Plik z backendu nr {detail.id}</p>
-                    <p> {detail.filename} </p>*/}
-                    {/* Form for deleting a file */}
-                    {/*<form onSubmit={(e) => this.handleDeleteFile(e, detail.id)}>
-                      <button type="submit">Usuń plik</button>
-                    </form>
-                  </div>
-                </div>
-              ))} */}
-            </div>
-            <div style={{display: 'flex', justifyContent: 'center', }}>
-            <div style={{
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div
+                style={{
                   display: 'flex',
                   width: '40%',
                   justifyContent: 'center',
                   padding: '10px',
                   margin: '0px 40px 0px 0px',
-              }}>
-                <ChangeFilesButton/> {/* Buttons to change code to compare */}
+                }}
+              >
+                <ChangeFilesButton
+                  onPreviousFile={this.handlePreviousFile}
+                  onNextFile={this.handleNextFile}
+                  currentFileIndex={this.state.currentFileIndex}
+                  totalFiles={this.state.fileDetails.length}
+                />
               </div>
-              <div style={{
+              <div
+                style={{
                   display: 'flex',
                   width: '40%',
                   justifyContent: 'center',
                   padding: '10px',
-                  margin: '0px 0px 0px 40px', 
-              }}>
-              <DropDown value={this.state.displayedFile}
-                        onChange={(e) => this.HandleDisplayFile(e)}
-                        options={this.getFileNames()}
-              />
+                  margin: '0px 0px 0px 40px',
+                }}
+              >
+                <DropDown
+                value={this.state.displayedFile} // Selected file name
+                onChange={this.HandleDisplayFile} // Updates displayedFile
+                options={this.state.uploadedFilesContent.map(file => file.name)} // File names as options
+                />
               </div>
             </div>
           </div>
@@ -365,5 +407,6 @@ class App extends React.Component {
     );
   }
 }
+
 
 export default App;
