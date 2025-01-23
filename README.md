@@ -19,7 +19,7 @@ System wykrywający plagiaty w kodzie źródłowym:
 Jesli chcemy, żeby środowisko dobrze nam śmigało, to:
 
 - Instalujemy gita na swojej maszynie,
-- Pobieramy i instalujemy Python 3.13.1 na swojej maszynie, <br>
+- Pobieramy i instalujemy Python (rekomendowany 3.13.1) na swojej maszynie, <br>
   _tu warto zaznaczyć, żeby dodał environment variables do path w systemie_
 - Pobieramy i instalujemy Node.js v20.15.0 bądż wyższą na swojej maszynie, <br>
 - Tworzymy nowy pusty folder,
@@ -33,9 +33,10 @@ Jesli chcemy, żeby środowisko dobrze nam śmigało, to:
 - Instalujemy Django i wymagane biblioteki <br>
   `pip install -r backend/requirements.txt`
 - Tworzymy migracje w django, które utworzą nam baze danych i inne struktury: <br>
-  `python manage.py backend/makemigrations`
-  `python manage.py backend/migrate`
+  `python backend/manage.py makemigrations`
+  `python backend/manage.py migrate`
 - Instalujemy Reacta i wymagane biblioteki node'a <br>
+  `cd backend/frontend` <br>
   `npm install`
 
 Teraz powinniśmy mieć aktywne venv i doinstalowane wszystko co potrzebne, żeby Python i React działały w naszym projekcie.
@@ -56,4 +57,4 @@ Teraz powinniśmy mieć aktywne venv i doinstalowane wszystko co potrzebne, żeb
   `npm start`
 - Wchodzimy w przeglądarce na `localhost:3000` (domyślny port to 3000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
 
-#### Więcej informacji np. odnośnie API i HDHGN jest w /docs
+#### Więcej informacji np. odnośnie API i HDHGN jest w `/docs`

@@ -19,21 +19,21 @@ class App extends React.Component {
     super(props);
     this.state = {
       textDetails: [], // Array to store text data retrieved from the server
-    //fileDetails: [], // Array to store file data retrieved from the server
-    fileDetails: [
-      { id: 1, name: "file1.txt", content: 
-        "This is file 1 content hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhh hhhhhhhhh hhhhhhhhhhhhhhh hhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh" },
-      { id: 2, name: "file2.txt", content: "This is file 2 content" },
-      { id: 3, name: "file3.txt", content: "This is file 3 content" },
-      { id: 4, name: "file4.txt", content: "This is file 4 content" },
-      { id: 5, name: "file5.txt", content: "This is file 5 content" },
-    ], // Hardcoded files for demonstration
-    inputText: "", // Input string from the user
-    files: [], // File selected by the user for upload
-    currentFileIndex: 0, // Track which file is being shown
-    activeTab: 1, // Active tab
-    displayedFile: "", // File to display, chosen by the user from the uploaded files
-    uploadedFilesContent: [], // Array to store content of uploaded files
+      //fileDetails: [], // Array to store file data retrieved from the server
+      fileDetails: [
+        { id: 1, name: "file1.txt", content: 
+          "This is file 1 content hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhh hhhhhhhhh hhhhhhhhhhhhhhh hhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh" },
+        { id: 2, name: "file2.txt", content: "This is file 2 content" },
+        { id: 3, name: "file3.txt", content: "This is file 3 content" },
+        { id: 4, name: "file4.txt", content: "This is file 4 content" },
+        { id: 5, name: "file5.txt", content: "This is file 5 content" },
+      ], // Hardcoded files for demonstration
+      inputText: "", // Input string from the user
+      files: [], // File selected by the user for upload
+      currentFileIndex: 0, // Track which file is being shown
+      activeTab: 1, // Active tab
+      displayedFile: "", // File to display, chosen by the user from the uploaded files
+      uploadedFilesContent: [], // Array to store content of uploaded files
     };
 
     // Create refs for the left and right CodeDisplay components
@@ -93,10 +93,6 @@ class App extends React.Component {
       });
   };
 
-  getFileNames = () => {
-    return this.state.fileDetails.map(file => file.name); // Returns files names
-  };
-
   //Lifecycle method called when the component mounts
   componentDidMount() {
     //Fetch initial data from the backend when the component mounts
@@ -116,15 +112,19 @@ class App extends React.Component {
   handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     
-    // Filter to ensure only .txt files are added
-    const txtFiles = selectedFiles.filter(file => file.type === 'text/plain');
-  
-    if (txtFiles.length === 0) {
-      alert("Tylko pliki .txt są dozwolone");
+    // Filter to ensure only .txt, .py, and .c files are added
+    // const txtFiles = selectedFiles.filter(file => file.type === 'text/plain');
+    const allowedExtensions = ['text/plain', 'application/x-python-code', 'text/x-csrc'];
+    const allowedFiles = selectedFiles.filter(file => allowedExtensions.includes(file.type) || file.name.endsWith('.py') || file.name.endsWith('.c'));
+
+    // Check if any files are selected
+    if (allowedFiles.length === 0) {
+      alert("Tylko pliki .txt, .py, i .c są dozwolone");
     }
   
-    // Update the state with only .txt files
-    this.setState(prevState => ({ files: [...prevState.files, ...txtFiles] }));
+    // Update the state with only allowed files
+    this.setState(prevState => ({ files: [...prevState.files, ...allowedFiles] }));
+
   };
 
   handleFileRemove = (fileName) => {
@@ -315,12 +315,14 @@ class App extends React.Component {
     this.setState({ displayedFile: event.target.value });
   };
 
+  // Returns files names
   getFileNames = () => {
-    return this.state.fileDetails.map(file => file.name); // Returns files names
+    return this.state.fileDetails.map(file => file.name); 
   };
 
+  // Returns user files names
   getUserFileNames = () => {
-    return this.state.files.map(file => file.name); // Returns files names
+    return this.state.files.map(file => file.name); 
   };
 
   // Render method to display the component UI
