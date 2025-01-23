@@ -3,6 +3,7 @@
 # environment
 .venv
 .vscode
+.vs
 
 # byte-compiled files
 **/__pycache__/**
@@ -41,6 +42,16 @@ backend/frontend/coverage
 
 # production
 backend/frontend/build
+
+# training files
+backend/HDHGN/data/**/*.txt
+backend/HDHGN/data/**/*.c
+backend/HDHGN/data/**/*.py
+backend/HDHGN/data/**/*.json
+backend/HDHGN/data/**/*.pt
+
+# model files
+backend/HDHGN/work_dir
 
 # misc
 .DS_Store
