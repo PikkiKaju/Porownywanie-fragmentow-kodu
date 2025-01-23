@@ -47,18 +47,24 @@ class FileView(APIView):
   # GET method to retrieve all File objects
   def get(self, request):
     # A list of dictionaries containing the id and file URL of each File object
-    fileDetail = [{"id": detail.id, "file": detail.file.url, "filename": detail.file.name} for detail in File.objects.all()]
-    return Response(fileDetail)
+    files = File.objects.all()  # Pobierz wszystkie pliki
+    serializer = FileSerializer(files, many=True)  # Zastosuj serializer do listy plików
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
   # POST method to upload a new file
   def post(self, request):
-    # Create a serializer instance with the request data
-    serializer = FileSerializer(data=request.data)
+        files = request.FILES.getlist('files')
 
-    # Check if the data is valid
-    if serializer.is_valid(raise_exception=True):
-      serializer.save()  # Save the new File object to the database
-      return Response(serializer.data)
+        if not files:
+            return Response({"error": "No files provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        file_instances = []
+        for file in files:
+            file_instance = File.objects.create(file=file)
+            file_instances.append(file_instance)
+
+        serializer = FileSerializer(file_instances, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
   # DELETE method to delete a File object by its primary key (pk)
   def delete(self, request, pk):
