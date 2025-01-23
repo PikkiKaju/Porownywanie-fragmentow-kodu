@@ -124,15 +124,15 @@ def move_files_c(source_path, new_path, num_files=11):
 
 
 if __name__ == "__main__":
-    num_files = args.num_files + 1
+    num_files = args.num_files
     source_path_python = args.directory_python
-    new_path_python = args.directory_python
+    new_path_python = "data/python_files"
 
     change_files_extensions(source_path_python)
     move_files(source_path_python, new_path_python, num_files=num_files)
     print(f"Python file extensions changed in {source_path_python} to .py and saved in {new_path_python} in separate folders.")
 
-    source_path_c = "data/txt_c_files"
+    source_path_c = args.directory_c
     new_path_c = "data/c_files"
     change_files_extensions_c(source_path_c)
     move_files_c(source_path_c, new_path_c, num_files=num_files)

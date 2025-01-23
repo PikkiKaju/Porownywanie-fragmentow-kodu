@@ -37,13 +37,31 @@ python PredictFile.py --file_path plik_do_klasyfikacji.py --model_path model.pth
 **Użycie:**
 
 ```
-python ProcessData.py
+python ProcessData.py [-p] [-c]
+
+opcje:
+  -p   czy przetworzyć pliki Python
+  -c   czy przetworzyć pliki C
 ```
 
 **Funkcje:**
 
 - `splitdata(source_files_path)`: Podział plików źródłowych Python na zestawy treningowe, walidacyjne i testowe.
 - `splitdata_c(source_files_path)`: Podział plików źródłowych C na zestawy treningowe, walidacyjne i testowe.
+
+### vocab.py
+
+**Cel:** Utworzenie słownika dla plików źródłowych Python i C.
+
+**Użycie:**
+
+```
+python vocab.py [-p] [-c]
+
+opcje:
+  -p   czy stworzyć słownik dla plików Python
+  -c   czy stworzyć słownik dla pliki C
+```
 
 ### prepare_source_files.py
 

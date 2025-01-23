@@ -1,9 +1,21 @@
+import argparse
 import ast
 from pycparser import c_parser, c_ast, parse_file
 from collections import Counter
 import json
 
 from utilities.utils import pre_walk_tree, pre_walk_tree_c
+
+# Initialize argument parser
+parser = argparse.ArgumentParser(prog="MakeVocab", description="Make vocabularies based on the source files.")
+
+# Adding optional arguments
+parser.add_argument("-p", action=argparse.BooleanOptionalAction, help = "Wheter to make the vocab for the Python files or not", dest="make_Python_vocab", type = bool, default = False)
+parser.add_argument("-c", action=argparse.BooleanOptionalAction, help = "Wheter to make the vocab for the C files or not", dest="make_C_vocab", type = bool, default = False)
+
+# Read arguments from command line
+args = parser.parse_args()
+
 
 class VocabEntry:
     """
@@ -161,11 +173,15 @@ class Vocab:
 
 
 if __name__ == '__main__':
-    print("Start building vocab for Python...")
-    v1 = Vocab.build_for_ast("data/train_files_paths.txt")
-    v1.save("data/vocab4ast.json")
-    print("Finished building Python vocabulary \n")
-    print("Start building vocab for C...")
-    v2 = Vocab.build_for_ast_c("data/train_files_paths_c.txt")
-    v2.save("data/vocab4ast_c.json")
-    print("Finished building C vocabulary \n")
+    if not args.make_Python_vocab and not args.make_C_vocab:
+        print("Specify which files to process. Use the -p or -c flag.")
+    if args.make_Python_vocab:
+        print("Start building vocab for Python...")
+        v1 = Vocab.build_for_ast("data/train_files_paths.txt")
+        v1.save("data/vocab4ast.json")
+        print("Finished building Python vocabulary \n")
+    if args.make_C_vocab:
+        print("Start building vocab for C...")
+        v2 = Vocab.build_for_ast_c("data/train_files_paths_c.txt")
+        v2.save("data/vocab4ast_c.json")
+        print("Finished building C vocabulary \n")
