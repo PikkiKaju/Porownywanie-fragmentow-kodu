@@ -135,6 +135,44 @@ class Vocab:
         paths_file.close()
         return Vocab(vocab)
 
+    @staticmethod
+    def c_ast_dump(node, annotate_fields=True, include_attributes=False, indent='  '):
+        """
+        Return a formatted dump of the C AST node for debugging purposes.
+
+        Args:
+            node (c_ast.Node): The AST node to dump.
+            annotate_fields (bool): Whether to include field names.
+            include_attributes (bool): Whether to include attributes.
+            indent (str): The string used for indentation.
+
+        Returns:
+            str: The formatted dump of the AST node.
+        """
+        def _format(node, level=0):
+            if isinstance(node, c_ast.Node):
+                fields = [(name, _format(value, level + 1)) for name, value in node.children()]
+                field_strs = []
+                for name, value in fields:
+                    if annotate_fields:
+                        field_strs.append(f'{name}={value}')
+                    else:
+                        field_strs.append(value)
+                return f'{node.__class__.__name__}({", ".join(field_strs)})'
+            elif isinstance(node, list):
+                lines = ['[']
+                lines.extend((indent * (level + 1) + _format(x, level + 1) + ',' for x in node))
+                if len(lines) > 1:
+                    lines.append(indent * level + ']')
+                else:
+                    lines[-1] += ']'
+                return '\n'.join(lines)
+            return repr(node)
+
+        if not isinstance(node, c_ast.Node):
+            raise TypeError(f'Expected c_ast.Node, got {type(node).__name__}')
+        return _format(node)
+
     def save(self, file_path: str):
         """
         Save the vocabulary to a file.
