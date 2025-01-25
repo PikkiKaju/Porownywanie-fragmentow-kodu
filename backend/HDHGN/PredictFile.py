@@ -5,20 +5,7 @@ from colorama import Fore, Style
 
 from MyDataset import HDHGData
 from vocab import Vocab
-from utilities.utils import pre_walk_tree
-
-
-# Initialize argument parser
-parser = argparse.ArgumentParser(prog="PredictFile", description="Predict the label for a given file using a pre-trained model.")
-
-# Adding optional arguments
-parser.add_argument("-fp", "--file_path", help = "Path to the file to be predicted", type = str, required=True)
-parser.add_argument("-mp", "--model_path", help = "Path to the pre-trained model", type = str, default = "work_dir/HDHGN/HDHGN.pt")
-parser.add_argument("-vp", "--vocab_path", help = "Path to the vocabulary file", type = str, default = "data/vocab4ast.json")
-parser.add_argument("-s", "--show_output", help = "Whether to show the probabilities for each label or not", type=bool, action = argparse.BooleanOptionalAction, default = False)
-
-# Read arguments from command line
-args = parser.parse_args()
+from utilities.utils import pre_walk_tree, pre_walk_tree_c
 
 
 def predict(file_path: str, model_path: str, vocab_path: str):
@@ -101,7 +88,19 @@ def predict(file_path: str, model_path: str, vocab_path: str):
 
 
 if __name__ == '__main__':
-    print(Fore.GREEN + "Making predictions..." + Style.RESET_ALL, flush=True)
+    # Initialize argument parser
+    parser = argparse.ArgumentParser(prog="PredictFile", description="Predict the label for a given file using a pre-trained model.")
+
+    # Adding optional arguments
+    parser.add_argument("-fp", "--file_path", help = "Path to the file to be predicted", type = str, required=True)
+    parser.add_argument("-mp", "--model_path", help = "Path to the pre-trained model", type = str, default="")
+    parser.add_argument("-vp", "--vocab_path", help = "Path to the vocabulary file", type = str, default="")
+    parser.add_argument("-s", "--show_output", help = "Whether to show the probabilities for each label or not", type=bool, action = argparse.BooleanOptionalAction, default = False)
+
+    # Read arguments from command line
+    args = parser.parse_args()
+
+    print(Fore.GREEN + "Making predictions..." + Style.RESET_ALL, end="\n", flush=True)
     model_path = args.model_path
     vocab_path = args.vocab_path
     file_to_test = args.file_path

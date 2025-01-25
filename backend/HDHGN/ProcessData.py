@@ -2,17 +2,7 @@ import argparse
 import os
 import ast
 from sklearn.model_selection import train_test_split
-from pycparser import c_parser, c_ast, parse_file
-
-# Initialize argument parser
-parser = argparse.ArgumentParser(prog="ProcessData", description="Split the dataset into training, validation, and test sets.")
-
-# Adding optional arguments
-parser.add_argument("-p", action=argparse.BooleanOptionalAction, help = "Wheter to process the Python files or not", dest="process_Python_files", type = bool, default = False)
-parser.add_argument("-c", action=argparse.BooleanOptionalAction, help = "Wheter to process the C files or not", dest="process_C_files", type = bool, default = False)
-
-# Read arguments from command line
-args = parser.parse_args()
+from pycparser import c_parser, parse_file
 
 
 def splitdata(source_files_path: str):
@@ -146,6 +136,17 @@ def splitdata_c(source_files_path: str):
     print("Finished splitting C data \n")
 
 if __name__ == '__main__':
+    # Initialize argument parser
+    parser = argparse.ArgumentParser(prog="ProcessData", description="Split the dataset into training, validation, and test sets.")
+
+    # Adding optional arguments
+    parser.add_argument("-p", action=argparse.BooleanOptionalAction, help = "Wheter to process the Python files or not", dest="process_Python_files", type = bool, default = False)
+    parser.add_argument("-c", action=argparse.BooleanOptionalAction, help = "Wheter to process the C files or not", dest="process_C_files", type = bool, default = False)
+
+    # Read arguments from command line
+    args = parser.parse_args()
+
+    print(Fore.GREEN + "Processing data:" + Style.RESET_ALL)
     if not args.process_Python_files and not args.process_C_files:
         print("Specify which files to process. Use the -p or -c flag.")
     if args.process_Python_files:

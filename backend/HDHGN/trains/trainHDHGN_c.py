@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import torch
+from colorama import Fore, Style
 from torch_geometric.loader import DataLoader
 from sklearn.metrics import accuracy_score
 from openpyxl import load_workbook
@@ -177,5 +178,5 @@ def valid(model, dataloader, device):
 
 
 if __name__ == '__main__':
-    print("start training on C files")
+    print(Fore.GREEN + "start training on C files" + Style.RESET_ALL)
     main()

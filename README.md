@@ -54,6 +54,7 @@ Teraz powinniśmy mieć aktywne venv i doinstalowane wszystko co potrzebne, żeb
 Żeby włączyć frontend zriobiony w React'cie, to musimy włączyć lokalny serwer Reacta:
 
 - Włączamy aplikację Reactową: <br>
+  `cd .\backend\frontend\` <br>
   `npm start`
 - Wchodzimy w przeglądarce na `localhost:3000` (domyślny port to 3000, ale może u was uruchomi się na innym, jeśli ten jest zajęty)
 
