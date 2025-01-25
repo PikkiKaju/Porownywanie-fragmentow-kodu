@@ -1,7 +1,9 @@
+import os
 import argparse
 import torch
 import ast
 from colorama import Fore, Style
+from pycparser import c_parser, parse_file
 
 from MyDataset import HDHGData
 from vocab import Vocab
@@ -18,10 +20,50 @@ def predict(file_path: str, model_path: str, vocab_path: str):
         vocab_path (str): Path to the vocabulary file.
 
     Returns:
-        torch.Tensor: Predicted output tensor.
         [(str, float, float)]: List of tuples containing the label, similarity value, and probability.
-        str: Predicted label for the file.
+        str: The type of file that was predicted (Python or C).
     """
+    python_parsed = False # Tells if the file was parsed as a Python file
+    c_parsed = False # Tells if the file was parsed as a C file
+
+    # Process the file
+    file_path = file_path.strip()
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            None
+    except FileNotFoundError:
+        print(Fore.RED + "Error: The file could not be found: " + Style.RESET_ALL + file_path )
+        return None, None
+
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            root = ast.parse(file.read())
+        index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree(root, 0, 0)
+
+        vocab_path = "data/vocab4ast.json"
+        model_path = "work_dir/HDHGN/HDHGN.pt"
+        python_parsed = True
+    except Exception as e:
+        print("The file could not be parsed as Python code.")
+        print(e)
+
+    if not python_parsed:
+        try:
+            root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "./utilities/fake_libc_include", "-std=c99"])
+            index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(root, 0, 0)
+
+            vocab_path = "data/vocab4ast_c.json"
+            model_path = "work_dir/HDHGN_C/HDHGN_C.pt"
+            c_parsed = True
+        except c_parser.ParseError:
+            print("The file could not be parsed as C code.")
+
+    if not python_parsed and not c_parsed:
+        print(Fore.RED + "Error: The file could not be processed as either Python or C code." + Style.RESET_ALL)
+        return None, None
+    else:
+        print(Fore.GREEN + "Predicting " + Fore.LIGHTBLUE_EX + ("Python" if python_parsed else "C") + Fore.GREEN + " file..." + Style.RESET_ALL)
+
     # Load vocab
     vocab = Vocab.load(vocab_path)
     
@@ -32,13 +74,7 @@ def predict(file_path: str, model_path: str, vocab_path: str):
     model = torch.load(model_path)
     model = model.to(device)
     model.eval()
-    
-    # Process the file
-    with open(file_path, 'r', encoding='utf-8') as file:
-        code = file.read()
-    root = ast.parse(code)
-    index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree(root, 0, 0)
-    
+
     # Encode types, features, and edge types
     types_encoded = [vocab.vocab["types"].word2id[t] for t in types]
     types_encoded = torch.tensor(types_encoded, dtype=torch.long)
@@ -58,8 +94,7 @@ def predict(file_path: str, model_path: str, vocab_path: str):
     # Make prediction
     with torch.no_grad():
         output = model(data.x, data.types, data.edge_types, data.edge_in_out_indexs, data.edge_in_out_head_tail, data.batch)
-        # probabilities = torch.nn.functional.softmax(output, dim=-1)
-        probabilities = torch.nn.functional.softmax(output)
+        probabilities = torch.nn.functional.softmax(output, dim=-1)
 
     # Decode predictions
     labels = list(vocab.vocab["labels"].word2id.keys())
@@ -69,22 +104,12 @@ def predict(file_path: str, model_path: str, vocab_path: str):
     sorted_values = [output[0][i].item() for i in sorted_indices[0]]
     sorted_probabilities = torch.sort(probabilities, descending=True).values
 
-
     # Create output frame
     output_frame = []
     for label, value, probability in zip(sorted_labels, sorted_values, sorted_probabilities[0]):
         output_frame.append((label, value, probability.item()))
 
-    sorted_values_max = 0
-    for value in sorted_values:
-        if value > 0:
-            sorted_values_max += value
-    sorted_probabilities = (value / sorted_values_max for value in sorted_values)
-    output_frame = []
-    for label, value, probability in zip(sorted_labels, sorted_values, sorted_probabilities):
-        output_frame.append((label, value, probability))
-
-    return output_frame
+    return output_frame, "Python" if python_parsed else "C"
 
 
 if __name__ == '__main__':
@@ -105,10 +130,11 @@ if __name__ == '__main__':
     vocab_path = args.vocab_path
     file_to_test = args.file_path
 
-    output_frame = predict(file_to_test, model_path, vocab_path)
-    label = output_frame[0][0]
-    print(f"The predicted label for the file is: {label}")
-    if args.show_output:
-        print("\nSorted labels with probability values:")
-        for label, value, probability in output_frame:
-            print(f"{label:<30} {value:.2f}  {probability:.4f}")
+    output_frame, file_type = predict(file_to_test, model_path, vocab_path)
+    if output_frame is not None:
+        label = output_frame[0][0]
+        print(f"The predicted label for the file " + Fore.LIGHTBLUE_EX + os.path.basename(args.file_path) + Style.RESET_ALL + " is: " +  Fore.GREEN + label + Style.RESET_ALL)
+        if args.show_output:
+            print("\nSorted labels with probability values:")
+            for label, value, probability in output_frame:
+                print(f"{label:<30} {value:.2f}  {probability:.4f}")
