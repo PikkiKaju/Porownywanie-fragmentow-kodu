@@ -1,6 +1,7 @@
 import argparse
 import os
 import ast
+from colorama import Fore, Style
 from sklearn.model_selection import train_test_split
 from pycparser import c_parser, parse_file
 
@@ -37,7 +38,7 @@ def splitdata(source_files_path: str):
                 code = open(file_path, encoding='utf-8').read()
                 try:
                     ast.parse(code)
-                    files_paths.append('../' + file_path.replace("\\", "/"))
+                    files_paths.append(file_path.replace("\\", "/"))
                     labels.append(root)
                 except SyntaxError:
                     print(f"Syntax error in file: {file_path}. File will be ignored.")
@@ -99,8 +100,8 @@ def splitdata_c(source_files_path: str):
             if file_name.endswith('.c'):
                 file_path = os.path.join(root, file_name)
                 try:
-                    parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "./utilities/fake_libc_include", "-std=c99"])
-                    files_paths.append('./' + file_path.replace("\\", "/"))
+                    parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I./utilities/fake_libc_include", "-std=c99"])
+                    files_paths.append(file_path.replace("\\", "/"))
                     labels.append(root)
                 except c_parser.ParseError as e:
                     print(f"Syntax error in file: {file_path}. File will be ignored. Error: {e}")
@@ -148,12 +149,12 @@ if __name__ == '__main__':
 
     print(Fore.GREEN + "Processing data:" + Style.RESET_ALL)
     if not args.process_Python_files and not args.process_C_files:
-        print("Specify which files to process. Use the -p or -c flag.")
+        print(Fore.RED + "Error: Specify which files to process. Use the -p or -c flag." + Style.RESET_ALL)
     if args.process_Python_files:
-        print("Start splitting Python data...")
+        print("-> Start splitting Python data...")
         source_files_path = "data/python_files"
         splitdata(source_files_path)
     if args.process_C_files:
-        print("Start spliting C data...")
+        print("-> Start spliting C data...")
         source_files_path_c = "data/c_files"
         splitdata_c(source_files_path_c)

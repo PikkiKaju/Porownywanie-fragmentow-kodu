@@ -4,7 +4,6 @@ from pycparser import c_parser, c_ast, parse_file
 from collections import Counter
 from colorama import Fore, Style
 import json
-from os.path import abspath
 
 from utilities.utils import pre_walk_tree, pre_walk_tree_c
 
@@ -62,7 +61,8 @@ class Vocab:
 
         tokens = {"types": [], "edge_types": [], "labels": []}
         for file_path in paths_file:
-            file = open(file_path[3:-1], encoding="utf-8")
+            file_path = file_path.strip()
+            file = open(file_path, encoding="utf-8")
             code = file.read()
             try:
                 root = ast.parse(code)
@@ -107,8 +107,9 @@ class Vocab:
 
         tokens = {"types": [], "edge_types": [], "labels": []}
         for file_path in paths_file:
+            file_path = file_path.strip()
             try:
-                root = parse_file(file_path.strip(), use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "./utilities/fake_libc_include", "-std=c99"])
+                root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "utilities/fake_libc_include", "-std=c99"])
                 index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(root, 0, 0)
                 for (type, feature) in zip(types, features):
                     if type in tokens:

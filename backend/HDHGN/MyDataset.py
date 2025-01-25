@@ -61,7 +61,8 @@ class HDHGNDataset(Dataset):
         """
         paths_file = open(self.paths_file_path)
         for i, file_path in enumerate(paths_file):
-            file = open(file_path[0:-1], encoding="utf-8")
+            file_path = "../" + file_path.strip()
+            file = open(file_path, encoding="utf-8")
             code = file.read()
 
             root = ast.parse(code)
@@ -146,7 +147,8 @@ class HDHGNDataset_C(Dataset):
         """
         paths_file = open(self.paths_file_path)
         for i, file_path in enumerate(paths_file):
-            root = parse_file("." + file_path.strip(), use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "../utilities/fake_libc_include", "-std=c99"])
+            file_path = "../" + file_path.strip()
+            root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "../utilities/fake_libc_include", "-std=c99"])
             index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(
                 root, 0, 0)
             types_encoded = [self.vocab.vocab["types"].word2id[t] for t in types]
