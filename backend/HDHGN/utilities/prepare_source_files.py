@@ -1,17 +1,33 @@
+import sys
 import os
 import argparse
 import shutil
 
-# Initialize argument parser
-parser = argparse.ArgumentParser()
 
-# Adding optional arguments
-parser.add_argument("-n", "--num_files", help="Number of files to create for each file in the source directory", type=int, default=10)
-parser.add_argument("-dp", "--directory_python", help="Path to the directory containing the Python files", type=str, default="data/txt_python_files")
-parser.add_argument("-dc", "--directory_c", help="Path to the directory containing the C files", type=str, default="data/txt_c_files")
+from colorama import Fore, Style
 
-# Read arguments from command line
-args = parser.parse_args()
+
+sys.path.append("..")
+
+def check_directory(directory):
+    """Checks if a directory exists and if it contains the source files.
+
+    Args:
+        directory: The path to the directory to check.
+    """
+
+    if not os.path.exists(directory):
+        print(Fore.RED + f"Directory '{directory}' does not exist." + Style.RESET_ALL)
+        return False
+    else:
+        files = os.listdir(directory)
+        if len(files) == 0:
+            print(Fore.RED + f"Directory '{directory}' is empty." + Style.RESET_ALL)
+            return False
+        elif len(files) == 1 and files[0] == "_readme.md":
+            print(Fore.RED + f"Directory '{directory}' is empty." + Style.RESET_ALL)
+            return False
+        return True
 
 def change_files_extensions(directory):
     """Changes file extensions from .txt to .py in a given directory.
@@ -59,7 +75,6 @@ def move_files(source_path, new_path, num_files=11):
     # Create a new directory
     try:
         os.mkdir(new_path)
-        print(f"Directory '{new_path}' created successfully.")
     except FileExistsError:
         print(f"Directory '{new_path}' already exists.")
     except PermissionError:
@@ -94,7 +109,6 @@ def move_files_c(source_path, new_path, num_files=11):
     # Create a new directory
     try:
         os.mkdir(new_path)
-        print(f"Directory '{new_path}' created successfully.")
     except FileExistsError:
         print(f"Directory '{new_path}' already exists.")
     except PermissionError:
@@ -116,16 +130,34 @@ def move_files_c(source_path, new_path, num_files=11):
 
 
 if __name__ == "__main__":
+    # Initialize argument parser
+    parser = argparse.ArgumentParser()
+
+    # Adding optional arguments
+    parser.add_argument("-n", "--num_files", help="Number of files to create for each file in the source directory", type=int, default=10)
+    parser.add_argument("-dp", "--directory_python", help="Path to the directory containing the Python files", type=str, default="data/txt_python_files")
+    parser.add_argument("-dc", "--directory_c", help="Path to the directory containing the C files", type=str, default="data/txt_c_files")
+
+    # Read arguments from command line
+    args = parser.parse_args()
     num_files = args.num_files
     source_path_python = args.directory_python
     new_path_python = "data/python_files"
-
-    change_files_extensions(source_path_python)
-    move_files(source_path_python, new_path_python, num_files=num_files)
-    print(f"Python file extensions changed in {source_path_python} to .py and saved in {new_path_python} in separate folders.")
-
     source_path_c = args.directory_c
     new_path_c = "data/c_files"
-    change_files_extensions_c(source_path_c)
-    move_files_c(source_path_c, new_path_c, num_files=num_files)
-    print(f"C file extensions changed in {source_path_c} to .c and saved in {new_path_c} in separate folders.")
+
+
+    # Change file extensions and move files
+    print(Fore.GREEN + "Prepare source files:" + Style.RESET_ALL, flush=True)
+    
+    if check_directory(source_path_python):
+        print(f"-> Changing file extensions in {source_path_python}...")
+        change_files_extensions(source_path_python)
+        move_files(source_path_python, new_path_python, num_files=num_files)
+        print(f"   Python file extensions changed in {source_path_python} to .py and saved in {new_path_python} in separate folders.")
+
+    if check_directory(source_path_c):
+        print(f"-> Changing file extensions in {source_path_c}...")
+        change_files_extensions_c(source_path_c)
+        move_files_c(source_path_c, new_path_c, num_files=num_files)
+        print(f"   C file extensions changed in {source_path_c} to .c and saved in {new_path_c} in separate folders.")
