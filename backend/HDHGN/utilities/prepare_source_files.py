@@ -2,12 +2,7 @@ import sys
 import os
 import argparse
 import shutil
-
-
 from colorama import Fore, Style
-
-
-sys.path.append("..")
 
 def check_directory(directory):
     """Checks if a directory exists and if it contains the source files.

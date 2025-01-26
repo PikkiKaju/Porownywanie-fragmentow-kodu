@@ -5,7 +5,7 @@ from collections import Counter
 from colorama import Fore, Style
 import json
 
-from utilities.utils import pre_walk_tree, pre_walk_tree_c
+from .utilities.utils import pre_walk_tree, pre_walk_tree_c
 
 
 class VocabEntry:

@@ -9,7 +9,7 @@
 **/__pycache__/**
 
 # local
-backend/media/uploads
+backend/media/uploads/**
 backend/db.sqlite3
 
 # source code files

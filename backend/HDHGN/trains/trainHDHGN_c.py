@@ -9,12 +9,10 @@ from openpyxl import load_workbook
 import xlsxwriter
 from tqdm import tqdm
 
-sys.path.append("..")
-
-from MyDataset import HDHGNDataset_C
-from models.HDHGN import HDHGN
-from vocab import Vocab
-from utilities.utils import show_2scores, show_score
+from HDHGN.MyDataset import HDHGNDataset_C
+from HDHGN.models.HDHGN import HDHGN
+from HDHGN.vocab import Vocab
+from HDHGN.utilities.utils import show_2scores, show_score
 
 
 def main():

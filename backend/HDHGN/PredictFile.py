@@ -1,3 +1,4 @@
+import sys
 import os
 import argparse
 import torch
@@ -5,12 +6,14 @@ import ast
 from colorama import Fore, Style
 from pycparser import c_parser, parse_file
 
-from MyDataset import HDHGData
-from vocab import Vocab
-from utilities.utils import pre_walk_tree, pre_walk_tree_c
+sys.path.append(os.path.dirname(__file__))
+
+from HDHGN.MyDataset import HDHGData
+from HDHGN.vocab import Vocab
+from HDHGN.utilities.utils import pre_walk_tree, pre_walk_tree_c
 
 
-def predict(file_path: str, model_path: str, vocab_path: str):
+def predict(file_path: str, model_path = "", vocab_path = ""):
     """
     Predict the label for a given file using a pre-trained model.
 
@@ -40,23 +43,29 @@ def predict(file_path: str, model_path: str, vocab_path: str):
             root = ast.parse(file.read())
         index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree(root, 0, 0)
 
-        vocab_path = "data/vocab4ast.json"
-        model_path = "work_dir/HDHGN/HDHGN.pt"
+        vocab_path = os.path.join(os.path.dirname(__file__), "data/vocab4ast.json")
+        model_path = os.path.join(os.path.dirname(__file__), "work_dir/HDHGN/HDHGN.pt")
         python_parsed = True
+    except SyntaxError:
+        print("The file could not be parsed as Python code due to a unknown syntax error.")
     except Exception as e:
-        print("The file could not be parsed as Python code.")
+        print("The file could not be parsed as Python code:")
         print(e)
 
     if not python_parsed:
         try:
-            root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", "-I" + "./utilities/fake_libc_include", "-std=c99"])
+            fake_lib_path = os.path.join(os.path.dirname(__file__), "utilities/fake_libc_include")  
+            root = parse_file(file_path, use_cpp=True, cpp_path="clang", cpp_args=["-E", f"-I{fake_lib_path}", "-std=c99"])
             index, edge_index, types, features, edge_types, edge_in_out_indexs_s, edge_in_out_indexs_t, edge_in_out_head_tail = pre_walk_tree_c(root, 0, 0)
 
-            vocab_path = "data/vocab4ast_c.json"
-            model_path = "work_dir/HDHGN_C/HDHGN_C.pt"
+            vocab_path = os.path.join(os.path.dirname(__file__), "data/vocab4ast_c.json")
+            model_path = os.path.join(os.path.dirname(__file__), "work_dir/HDHGN_C/HDHGN_C.pt")
             c_parsed = True
         except c_parser.ParseError:
-            print("The file could not be parsed as C code.")
+            print("The file could not be parsed as C code due to a parsing error.")
+        except Exception as e:
+            print("The file could not be parsed as C code:")
+            print(e)
 
     if not python_parsed and not c_parsed:
         print(Fore.RED + "Error: The file could not be processed as either Python or C code." + Style.RESET_ALL)
@@ -109,6 +118,7 @@ def predict(file_path: str, model_path: str, vocab_path: str):
     for label, value, probability in zip(sorted_labels, sorted_values, sorted_probabilities[0]):
         output_frame.append((label, value, probability.item()))
 
+    print("Done predicting.")
     return output_frame, "Python" if python_parsed else "C"
 
 
