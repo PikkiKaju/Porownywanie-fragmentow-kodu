@@ -11,6 +11,9 @@ import Scroll from "./Components/Scroll.js";
 import DropDown from './Components/DropDown.js'
 import { createRef } from "react";
 
+const BASE_URL = "http://localhost:8000";
+ 
+
 // Main React component for the application
 class App extends React.Component {
   
@@ -113,7 +116,6 @@ class App extends React.Component {
     const selectedFiles = Array.from(e.target.files);
     
     // Filter to ensure only .txt, .py, and .c files are added
-    // const txtFiles = selectedFiles.filter(file => file.type === 'text/plain');
     const allowedExtensions = ['text/plain', 'application/x-python-code', 'text/x-csrc'];
     const allowedFiles = selectedFiles.filter(file => allowedExtensions.includes(file.type) || file.name.endsWith('.py') || file.name.endsWith('.c'));
 
@@ -124,7 +126,6 @@ class App extends React.Component {
   
     // Update the state with only allowed files
     this.setState(prevState => ({ files: [...prevState.files, ...allowedFiles] }));
-
   };
 
   handleFileRemove = (fileName) => {
@@ -156,10 +157,10 @@ class App extends React.Component {
     }
   
     const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
+    files.forEach((file, i) => formData.append(`files`, file));
   
     axios
-      .post("http://localhost:8000/file/", formData, {
+      .post(`${BASE_URL}/file/`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       .then((res) => {
@@ -173,6 +174,40 @@ class App extends React.Component {
       });
   };
   
+  // Handler function to upload the selected file to the server for the HDHGN to analyze
+  handleFileUploadForHDHGN = (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
+    const files = this.state.files; // Get the file from state
+    
+    // Check if a file is selected
+    if (!files || files.length === 0) {
+      alert("Wprowadź plik do wysłania");
+      return;
+    }
+
+    // Create a new FormData object and append the uploaded files to it
+    const formData = new FormData();
+    files.forEach((file, i) => formData.append(`files`, file, file.name));
+  
+    // Send a POST request to the server with the file data
+    axios
+      .post(`${BASE_URL}/predict/`, formData, {
+        // API endpoint for file upload
+        headers: {
+          "Content-Type": "multipart/form-data", // Set content type for file upload
+        },
+      })
+      .then((res) => {        
+        this.readFileContent(files); // Read the file content after upload and save it to uploadedFilesContent
+        this.switchTab(2);  // Switch to tab 2
+        this.ProcessModelResults(res); // Process the model results from the server
+      })
+      .catch((err) => {
+        console.error("Error uploading file: ", err);
+        alert("Nie udało się wysłać pliku");
+      });
+  };
+
   readFileContent = (files) => {
     const fileContents = [];
     files.forEach((file) => {
@@ -196,6 +231,11 @@ class App extends React.Component {
     });
   };
 
+  // Function handling the HDHGN prediction results received from the server 
+  ProcessModelResults = (response) => {
+    console.log(response.data);
+  };
+
   // Handler function to submit text data to the server
   handleTextSubmit = (e) => {
     e.preventDefault(); // Prevent default form submission behavior
@@ -208,7 +248,7 @@ class App extends React.Component {
 
     // Send a POST request to the server with the input text
     axios
-      .post("http://localhost:8000/wel/", {
+      .post(`${BASE_URL}/wel/`, {
         // API endpoint URL
         inputText: this.state.inputText, // Send the input text to the backend
       })
@@ -232,7 +272,7 @@ class App extends React.Component {
 
     // Send a DELETE request to the server to delete a text item by ID
     axios
-      .delete(`http://localhost:8000/wel/${id}/`) // API endpoint for deleting an item by ID
+      .delete(`${BASE_URL}/wel/${id}/`) // API endpoint for deleting an item by ID
       .then((res) => {
         // Fetch updated data after successful deletion
         this.getTextData();
@@ -249,7 +289,7 @@ class App extends React.Component {
 
     // Send a delete request to the server to delete a file by ID
     axios
-      .delete(`http://localhost:8000/file/${id}/`) // API endpoint for deleting an item by ID
+      .delete(`${BASE_URL}/file/${id}/`) // API endpoint for deleting an item by ID
       .then((res) => {
         // Fetch updated data after successful deletion
         this.getFileData();
@@ -257,44 +297,6 @@ class App extends React.Component {
       .catch((err) => {
         console.error("Error while deleting data: ", err);
         alert("Nie udało się usunąć pliku");
-      });
-  };
-  
-  // Handler function to upload the selected file to the server for the HDHGN to analyze
-  handleFileForHDHGN = (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-    const file = this.state.file; // Get the file from state
-    
-    // Check if a file is selected
-    if (file === null) {
-      alert("Wprowadź plik do wysłania");
-      return;
-    }
-
-    // Create a new FormData object
-    const formData = new FormData(); 
-    formData.append("file", file); // Append the file to the FormData
-    formData.append("filename", file.name); // Append the filename to the FormData
-
-    // Send a POST request to the server with the file data
-    axios
-      .post("http://localhost:8000/analyze/", formData, {
-        // API endpoint for file upload
-        headers: {
-          "Content-Type": "multipart/form-data", // Set content type for file upload
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        
-        // Clear the file state after successful upload
-        this.setState({
-          file: null,
-        });
-      })
-      .catch((err) => {
-        console.error("Error uploading file: ", err);
-        alert("Nie udało się wysłać pliku");
       });
   };
 
@@ -328,7 +330,6 @@ class App extends React.Component {
   // Render method to display the component UI
   render() {
     const { activeTab, files, displayedFile, currentFileIndex, fileDetails, uploadedFilesContent } = this.state;
-    console.log("Uploaded Files Content: ", this.state.uploadedFilesContent);
     // Get the content of the currently selected file for the left box
     const currentFile = fileDetails[currentFileIndex]; // Get current file based on fileDetails
     // Get the content of the currently selected file for the right box
@@ -346,7 +347,7 @@ class App extends React.Component {
               onFileChange={this.handleFileChange}
               onFileRemove={this.handleFileRemove}
             />
-            <form onSubmit={this.handleFileUpload}>
+            <form onSubmit={this.handleFileUploadForHDHGN}>
               <SendFiles />
             </form>
           </div>
