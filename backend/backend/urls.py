@@ -17,16 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from app import views
+from app.views import TextView, FileListView, FileSingleView, FilePredictView
 from backend import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('wel/', views.TextView.as_view(), name="upload-text"),
-    path('wel/<int:pk>/', views.TextView.as_view(), name="delete-text"),
-    path('file/', views.FileView.as_view(), name="upload-files"),
-    path('file/<int:pk>/', views.FileView.as_view(), name="delete-file"),
-    path('predict/', views.FileView.as_view(), {"analize": True}, name="predict-file"),
+    path('wel/', TextView.as_view(), name="upload-text"),
+    path('wel/<int:pk>/', TextView.as_view(), name="delete-text"),
+    path('file/', FileListView.as_view(), name="file"),
+    path('file/<int:pk>/', FileSingleView.as_view(), name="file-by-id"),
+    path('predict/', FilePredictView.as_view(), name="predict-file"),
 ]
 
 if settings.DEBUG:

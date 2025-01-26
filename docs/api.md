@@ -1,10 +1,10 @@
 # Dokumentacja API
 
-To API jest zrobione poprzez django rest-framework i póki co składa się z end-pointów do przesyłania tekstu i plików.
+API jest zrobione z django rest-framework i póki co składa się z end-pointów do przesyłania tekstu i plików.
 
 **Adres Bazowy:** `http://localhost:8000/`
 
-### 1. Zarządzanie Danymi Tekstowymi (/wel/)
+### 1. Zarządzanie danymi tekstowymi (/wel/)
 
 **Model:** `Text`
 
@@ -14,7 +14,7 @@ To API jest zrobione poprzez django rest-framework i póki co składa się z end
 | POST   | Tworzy nowy wpis.                        | `{ "inputText": string }`               | `{ "id": int, "inputText": string }`                            | 201             |
 | DELETE | Usuwa wpis o podanym ID.                 | Brak, ale wymaga ID w URL: `/wel/{id}/` | 204 No Content (sukces) <br> lub 404 Not Found (nie znaleziono) | 204, 404        |
 
-##### Przykład użycia w `javascript` poprzez `axios`:
+##### Przykład użycia z `axios`:
 
 ```javascript
 // Pobieranie wpisów tekstowych z serwera
@@ -37,26 +37,21 @@ axios
   .then((response) => {});
 ```
 
-### 2. Przesyłanie Plików (/file/)
+### 2. Zarządzanie plikami (/file/)
 
 **Model:** `File`
 
 | Metoda | Opis                              | Parametry w żądaniu (Multipart/form-data) | Odpowiedź (JSON)                                                         | Kody odpowiedzi |
 | ------ | --------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------ | --------------- |
-| GET    | Pobiera listę przesłanych plików. | Brak                                      | `[{ "id": int, "file": string }]` (ścieżka pliku - **Należy poprawić!**) | 200             |
-| POST   | Przesyła nowy plik.               | `file` (plik)                             | `{ "id": int, "file": string }` (ścieżka pliku - **Należy poprawić!**)   | 201             |
+| GET    | Pobiera listę przesłanych plików. | Brak                                      | `[{ "id": int, "file_name": string, file_content": string }]`            | 200, 404        |
+| GET    | Pobiera plik o podanym ID.        | Brak, ale wymaga ID w URL: `/file/{id}/`  | `{ "id": int, "file_name": string, file_content": string }`              | 200, 404        |
+| POST   | Przesyła nowy plik.               | `FormData` (dane z formularza z plikiem)  | `{ "id": int, "file": string }`                                          | 201             |
 | DELETE | Usuwa plik o podanym ID.          | Brak, ale wymaga ID w URL: `/file/{id}/`  | 204 No Content (sukces) lub 404 Not Found                                | 204, 404        |
 
-##### Przykład użycia w `javascript` poprzez `axios`:
+
+##### Przykład użycia z `axios`:
 
 ```javascript
-// Pobieranie plików z serwera
-axios
-  .get("http://localhost:8000/file/") // API endpoint URL
-  .then((response) => {
-    this.setState({ response: response.data });
-  });
-
 // Wysyłanie pliku na serwer
 const formData = new FormData(); // Obiekt FormData
 axios
@@ -67,11 +62,35 @@ axios
   )
   .then((response) => {});
 
+// Pobieranie plików z serwera
+axios
+  .get("http://localhost:8000/file/") // API endpoint URL
+  .then((response) => {
+    this.setState({ response: response.data });
+  });
+
+// Pobieranie plik o podanym ID z serwera
+axios
+  .get("http://localhost:8000/file/<ID_Pliku>") // API endpoint URL
+  .then((response) => {
+    this.setState({ response: response.data });
+  });
+
 // Usuwanie pliku z bazy serwera
 axios
   .delete(`http://localhost:8000/file/${id}/`) // API endpoint URL z id pliku do usunięcia
   .then((response) => {});
+
+// Wysyłanie pliku do predykcji przez model HDHGN
+axios
+  .post(
+    "http://localhost:8000/predict/", // API endpoint URL
+    formData, // dane z formularza z plikiem
+    { headers: { "Content-Type": "multipart/form-data" } } // Typ danych jako multipart/form-data wymagany przez parser API
+  )
+  .then((response) => {});
 ```
 
+
 **Uwagi:**
-Wszystkie dane tekstowe i pliki przesyłane na serwer zapisywane są lokalnie w bazie, która znajduje się w pliku `db.sqlite3` oraz pod ścieżką `media/uploads` i pliki te nie są śledzone przez gita.
+Wszystkie dane tekstowe i pliki przesyłane na serwer zapisywane są lokalnie w bazie, która znajduje się w pliku `db.sqlite3` oraz pod ścieżką `media/uploads`.

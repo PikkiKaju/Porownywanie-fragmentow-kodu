@@ -36,24 +36,16 @@ class TextView(APIView):
   # DELETE method to delete a Text object by its primary key (pk)
   def delete(self, request, pk):
     try:
-      react_object = Text.objects.get(pk=pk)  # Retrieve the Text object to be deleted
-      react_object.delete()  # Delete the object from the database
+      text_object = Text.objects.get(pk=pk)  # Retrieve the Text object to be deleted
+      text_object.delete()  # Delete the object from the database
       return Response(status=status.HTTP_204_NO_CONTENT)
     except Text.DoesNotExist:
       return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-# Class-based view for handling file uploads
-class FileView(APIView):
+class FileListView(APIView):
     parser_classes = [MultiPartParser]  # Set the parser for handling multipart form data (file uploads)
     serializer_class = FileSerializer
-
-    # GET method to retrieve all File objects
-    def get(self, request):
-        # A list of dictionaries containing the id and file URL of each File object
-        files = File.objects.all()  
-        serializer = FileSerializer(files, many=True)  
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     # POST method to upload a new file
     def post(self, request):
@@ -69,35 +61,71 @@ class FileView(APIView):
 
         serializer = FileSerializer(file_instances, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    # GET method to retrieve all File objects
+    def get(self, request):
+        try:
+            # A list of dictionaries containing the id and file path of each File object
+            files = File.objects.all()
 
+            # Create the response object
+            response = []
+            for file in files:
+                file_path = file.file.path
+                # Check if file exists and add its contents to the response
+                if os.path.exists(file_path):
+                    with open(file_path, 'rb') as f:
+                        file_content = f.read()
+                    response.append({
+                        "id": file.id,
+                        "file_name": file.file.name,
+                        "file_content": file_content
+                    })
+            return Response(response, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+# Class-based view for handling file uploads
+class FileSingleView(APIView):
+    # GET method to retrieve a speicific File object by its primary key (pk)
+    def get(self, request, pk):
+        try:
+            file_object = File.objects.get(pk=pk) # Retrive the File object
+            file_path = file_object.file.path # Get the file path
+            # Check if file exists and send its contents
+            if os.path.exists(file_path):
+                with open(file_path, 'rb') as file:
+                    file_content = file.read()
+                
+                return Response(file_content, content_type='application/octet-stream', status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
     # DELETE method to delete a File object by its primary key (pk)
     def delete(self, request, pk):
         try:
-            react_object = File.objects.get(pk=pk)  # Retrieve the File object to be deleted
-            react_object.delete()  # Delete the object from the database
+            file_object = File.objects.get(pk=pk)  # Retrieve the File object to be deleted
+            file_path = file_object.file.path  # Get the file path
+
+            # Delete the object from the database
+            file_object.delete() 
+
+            # Delete the file from the file system
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
             return Response(status=status.HTTP_204_NO_CONTENT) 
         except File.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-    def runFilePrediction(self, file_path):
-        '''
-        Run file prediction script using HDHGN and return the results.
 
-        Returns:
-        dict object: {file_type, results: [{label, similarity_value, probability}]}
-        '''
-        results, file_type = HDHGN.PredictFile.predict(file_path)
-        if results is not None:
-            results_dict = {
-                "file_type": file_type,
-                "results": results
-            }
-        else:
-            results_dict = None
-        return results_dict
-    
+class FilePredictView(APIView):
+    parser_classes = [MultiPartParser]
+
     # POST method to upload a new file
-    def post(self, request, analize):
+    def post(self, request):
         # Check if the request is valid
         files = request.FILES.getlist('files')
         if not files:
@@ -113,5 +141,23 @@ class FileView(APIView):
             # Delete the File instance from db and storage
             file_instance.delete()
 
-
         return Response(json.dumps(results), status=status.HTTP_201_CREATED)
+
+    def runFilePrediction(self, file_path):
+        '''
+        Run file prediction script using HDHGN and return the results.
+
+        Returns:
+        dict object: {results: [{label, similarity_value, probability}], file_type: str}
+        '''
+        results, file_lang = HDHGN.PredictFile.predict(file_path)
+        if results is not None:
+            results_dict = {
+                "file_name": os.path.basename(file_path),
+                "file_lang": file_lang,
+                "results": results
+            }
+        else:
+            results_dict = None
+        return results_dict
+    
