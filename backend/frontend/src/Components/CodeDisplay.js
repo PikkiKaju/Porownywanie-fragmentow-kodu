@@ -4,8 +4,15 @@ import React, { useEffect } from 'react';
 
 const CodeDisplay = React.forwardRef(({ code }, ref) => {
   useEffect(() => {
+    // Reset any previous highlights before applying new highlights
+    const codeElements = ref.current.querySelectorAll('pre code');
+    codeElements.forEach((codeElement) => {
+      codeElement.dataset.highlighted = ''; // Unset any previously highlighted status
+    });
+    
+    // Apply highlight.js to all code blocks
     hljs.highlightAll();
-  }, []);
+  }, [code, ref]); // Re-run the effect when `code` or `ref` changes
 
   return (
     <div
