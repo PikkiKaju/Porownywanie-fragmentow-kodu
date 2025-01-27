@@ -80,6 +80,20 @@ axios
 axios
   .delete(`http://localhost:8000/file/${id}/`) // API endpoint URL z id pliku do usunięcia
   .then((response) => {});
+```
+### 3. Predykcja kodu w plikach (/predict/)
+
+**Model:** `File`
+
+| Metoda | Opis                              | Parametry w żądaniu (Multipart/form-data) | Odpowiedź (JSON)                                                         | Kody odpowiedzi |
+| ------ | --------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------ | --------------- |
+| POST   | Przesyła pliki do predykcji.      | `FormData` (dane z formularza z plikiem)  | `{ "file_name": string, "file_lang": string, "results": {label: string, similarity_value: float, probability: float} }`                                          | 201             |
+
+```
+// Utworzenie obiektu FormData
+const files = this.state.files;
+const formData = new FormData();
+  files.forEach((file, i) => formData.append(`files`, file, file.name));
 
 // Wysyłanie pliku do predykcji przez model HDHGN
 axios
