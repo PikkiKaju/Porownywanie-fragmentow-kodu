@@ -26,7 +26,6 @@ backend/HDHGN/data/valid_files_paths.txt
 # data files
 backend/HDHGN/data/python_files
 backend/HDHGN/data/c_files
-backend/HDHGN/data/vocab4ast.json
 backend/HDHGN/data/test/
 backend/HDHGN/data/train/
 backend/HDHGN/data/valid/
@@ -47,7 +46,6 @@ backend/frontend/build
 backend/HDHGN/data/**/*.txt
 backend/HDHGN/data/**/*.c
 backend/HDHGN/data/**/*.py
-backend/HDHGN/data/**/*.json
 backend/HDHGN/data/**/*.pt
 
 # misc
