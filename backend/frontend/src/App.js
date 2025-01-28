@@ -22,15 +22,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       textDetails: [], // Array to store text data retrieved from the server
-      //fileDetails: [], // Array to store file data retrieved from the server
-      fileDetails: [
-        { id: 1, name: "file1.txt", content: 
-          "This is file 1 content hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhh hhhhhhhhh hhhhhhhhhhhhhhh hhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhh  hhhhhhhhhhhhhh  hhhhhhhhhhhhhh hhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhhhhh hhhhhhhh hhhhhhhhhhhhhhh hhhhhhhhhhhhhhhhhh hhhhhhhhhhhh" },
-        { id: 2, name: "file2.txt", content: "This is file 2 content" },
-        { id: 3, name: "file3.txt", content: "This is file 3 content" },
-        { id: 4, name: "file4.txt", content: "This is file 4 content" },
-        { id: 5, name: "file5.txt", content: "This is file 5 content" },
-      ], // Hardcoded files for demonstration
+      fileDetails: {id:[], name: [],prob: []}, // Array to store file data retrieved from the server
       inputText: "", // Input string from the user
       files: [], // File selected by the user for upload
       currentFileIndex: 0, // Track which file is being shown
@@ -134,14 +126,14 @@ class App extends React.Component {
 
   handleNextFile = () => {
     this.setState((prevState) => {
-      const nextIndex = (prevState.currentFileIndex + 1) % this.state.fileDetails.length; // Ensure only 5 files are navigable
+      const nextIndex = (prevState.currentFileIndex + 1) % this.state.fileDetails.name.length; // Ensure only 5 files are navigable
       return { currentFileIndex: nextIndex };
     });
   };
   
   handlePreviousFile = () => {
     this.setState((prevState) => {
-      const prevIndex = (prevState.currentFileIndex - 1 + this.state.fileDetails.length) % this.state.fileDetails.length; // Wrap-around for hardcoded files
+      const prevIndex = (prevState.currentFileIndex - 1 + this.state.fileDetails.name.length) % this.state.fileDetails.length; // Wrap-around for hardcoded files
       return { currentFileIndex: prevIndex };
     });
   };
@@ -233,7 +225,38 @@ class App extends React.Component {
 
   // Function handling the HDHGN prediction results received from the server 
   ProcessModelResults = (response) => {
-    console.log(response.data);
+    console.log("Full response:", response);
+    
+    // Parse the response string if necessary
+    let data;
+    try {
+      data = JSON.parse(response.data);
+    } catch (error) {
+      console.error("Error parsing response data:", error);
+      return;
+    }
+  
+    // Ensure data[0] and data[0].results exist before trying to access them
+    if (data && data[0] && Array.isArray(data[0].results) && data[0].results.length > 0) {
+      // Extract the first 5 algorithm names
+      const topFiveNames = data[0].results.slice(0, 5).map((item) => item[0]);
+  
+      // Check if data[0].results contains enough elements for probabilities
+      const topFiveProbs = data[0].results.slice(0, 5).map((item) => {
+        return item[2]; // Extracting the third element (probability)
+      });
+  
+      // Update the state
+      this.setState({
+        fileDetails: {
+          id: [1, 2, 3, 4, 5],
+          name: topFiveNames,
+          prob: topFiveProbs,
+        },
+      });
+    } else {
+      console.error("Response data is empty, invalid, or missing results.");
+    }
   };
 
   // Handler function to submit text data to the server
@@ -330,13 +353,14 @@ class App extends React.Component {
   // Render method to display the component UI
   render() {
     const { activeTab, files, displayedFile, currentFileIndex, fileDetails, uploadedFilesContent } = this.state;
-    // Get the content of the currently selected file for the left box
-    const currentFile = fileDetails[currentFileIndex]; // Get current file based on fileDetails
+    const currentFileName = fileDetails.name[currentFileIndex] || "No algorithm name available"; //Get current file name based on fileDetails
+    const currentProb = fileDetails.prob[currentFileIndex] || "No probability available"; // Get current file prob based on fileDetails
+    const formattedProb = (currentProb * 100).toFixed(2);
     // Get the content of the currently selected file for the right box
     const fileContentToDisplay = uploadedFilesContent.find(
       (file) => file.name === displayedFile
     )?.content || uploadedFilesContent[0]?.content || "No content available";
-    
+    console.log("filedetails:",fileDetails);
     return (
       <div className="container">
         {activeTab === 1 ? ( // tab1
@@ -384,13 +408,13 @@ class App extends React.Component {
                   transform: 'translateX(-50%)',
                 }}
               >
-                Podobieństwo 50%
+                {`Podobieństwo: ${formattedProb}%`} {/* Displaying prob */}
               </h1>
             </div>
   
             <div style={{ display: 'flex', height: '65%', justifyContent: 'center' }}>
               {/* Left Box (Content from fileDetails) */}
-              <CodeDisplay ref={this.leftBoxRef} code={currentFile?.content || "No content available"} />
+              <CodeDisplay ref={this.leftBoxRef} code={currentFileName} />
               
               <div
                 style={{
@@ -423,7 +447,7 @@ class App extends React.Component {
                   onPreviousFile={this.handlePreviousFile}
                   onNextFile={this.handleNextFile}
                   currentFileIndex={this.state.currentFileIndex}
-                  totalFiles={this.state.fileDetails.length}
+                  totalFiles={this.state.fileDetails.name.length}
                 />
               </div>
               <div
