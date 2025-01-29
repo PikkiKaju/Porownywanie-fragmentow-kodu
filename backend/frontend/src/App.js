@@ -133,7 +133,7 @@ class App extends React.Component {
   
   handlePreviousFile = () => {
     this.setState((prevState) => {
-      const prevIndex = (prevState.currentFileIndex - 1 + this.state.fileDetails.name.length) % this.state.fileDetails.length; // Wrap-around for hardcoded files
+      const prevIndex = (prevState.currentFileIndex - 1 + this.state.fileDetails.name.length) % this.state.fileDetails.name.length; // Wrap-around for hardcoded files
       return { currentFileIndex: prevIndex };
     });
   };
@@ -411,10 +411,22 @@ class App extends React.Component {
                 {`Podobieństwo: ${formattedProb}%`} {/* Displaying prob */}
               </h1>
             </div>
-  
+            <div style={{ display: 'flex', marginTop: '40px', flexDirection: 'column' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae' }}>
+                ORYGINALNY KOD
+              </div>
+              <div style={{ display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae' }}>
+                KOD Z WYKRYTYM PODOBIEŃSTWEM
+              </div>
+            </div>
+            <div style={{ display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae', marginTop: '5px', marginLeft: '50%' }}>
+              {currentFileName}
+            </div>
+          </div>
             <div style={{ display: 'flex', height: '65%', justifyContent: 'center' }}>
-              {/* Left Box (Content from fileDetails) */}
-              <CodeDisplay ref={this.leftBoxRef} code={currentFileName} />
+              {/* Right Box (Content from fileDetails) */}
+              <CodeDisplay ref={this.rightBoxRef} code={fileContentToDisplay} />
               
               <div
                 style={{
@@ -429,8 +441,8 @@ class App extends React.Component {
                 <Scroll icon="⮟" onClick={this.scrollDown} />
               </div>
   
-              {/* Right Box (Content from user selected file) */}
-              <CodeDisplay ref={this.rightBoxRef} code={fileContentToDisplay} />
+              {/* Left Box (Content from user selected file) */}
+              <CodeDisplay ref={this.leftBoxRef} code={currentFileName} />
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -443,11 +455,10 @@ class App extends React.Component {
                   margin: '0px 40px 0px 0px',
                 }}
               >
-                <ChangeFilesButton
-                  onPreviousFile={this.handlePreviousFile}
-                  onNextFile={this.handleNextFile}
-                  currentFileIndex={this.state.currentFileIndex}
-                  totalFiles={this.state.fileDetails.name.length}
+                <DropDown
+                value={this.state.displayedFile} // Selected file name
+                onChange={this.HandleDisplayFile} // Updates displayedFile
+                options={this.state.uploadedFilesContent.map(file => file.name)} // File names as options
                 />
               </div>
               <div
@@ -459,10 +470,11 @@ class App extends React.Component {
                   margin: '0px 0px 0px 40px',
                 }}
               >
-                <DropDown
-                value={this.state.displayedFile} // Selected file name
-                onChange={this.HandleDisplayFile} // Updates displayedFile
-                options={this.state.uploadedFilesContent.map(file => file.name)} // File names as options
+                <ChangeFilesButton
+                  onPreviousFile={this.handlePreviousFile}
+                  onNextFile={this.handleNextFile}
+                  currentFileIndex={this.state.currentFileIndex}
+                  totalFiles={this.state.fileDetails.name.length}
                 />
               </div>
             </div>
