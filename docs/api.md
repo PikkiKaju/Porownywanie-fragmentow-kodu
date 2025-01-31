@@ -78,7 +78,7 @@ axios
 
 // Usuwanie pliku z bazy serwera
 axios
-  .delete(`http://localhost:8000/file/${id}/`) // API endpoint URL z id pliku do usunięcia
+  .delete(`http://localhost:8000/file/<ID_Pliku>/`) // API endpoint URL z id pliku do usunięcia
   .then((response) => {});
 ```
 ### 3. Predykcja kodu w plikach (/predict/)
@@ -87,9 +87,9 @@ axios
 
 | Metoda | Opis                              | Parametry w żądaniu (Multipart/form-data) | Odpowiedź (JSON)                                                         | Kody odpowiedzi |
 | ------ | --------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------ | --------------- |
-| POST   | Przesyła pliki do predykcji.      | `FormData` (dane z formularza z plikiem)  | `{ "file_name": string, "file_lang": string, "results": {label: string, similarity_value: float, probability: float} }`                                          | 201             |
+| POST   | Przesyła pliki do predykcji.      | `FormData` (dane z formularza z plikiem)  | `{ "file_name": string, "file_lang": string, "results": [[label: string, similarity_value: float, probability: float]], "files_contents": [[file_name: string, file_content: string]]}` | 201             |
 
-```
+```javascript
 // Utworzenie obiektu FormData
 const files = this.state.files;
 const formData = new FormData();
@@ -98,7 +98,7 @@ const formData = new FormData();
 // Wysyłanie pliku do predykcji przez model HDHGN
 axios
   .post(
-    "http://localhost:8000/predict/", // API endpoint URL
+    "http://localhost:8000/predict/<liczba_podobnych_plików_w_odpowiedzi>", // API endpoint URL
     formData, // dane z formularza z plikiem
     { headers: { "Content-Type": "multipart/form-data" } } // Typ danych jako multipart/form-data wymagany przez parser API
   )

@@ -12,23 +12,29 @@
 backend/media/uploads/**
 backend/db.sqlite3
 
-# source code files
-backend/HDHGN/data/txt_python_files/*.py
-backend/HDHGN/data/txt_c_files/*.c
-backend/HDHGN/data/txt_python_files/*.txt
-backend/HDHGN/data/txt_c_files/*.txt
-
 # split data files paths
 backend/HDHGN/data/test_files_paths.txt
 backend/HDHGN/data/train_files_paths.txt
 backend/HDHGN/data/valid_files_paths.txt
 
-# data files
+# training source files
 backend/HDHGN/data/python_files
 backend/HDHGN/data/c_files
+
+# training data files
 backend/HDHGN/data/test/
+backend/HDHGN/data/test_c/
 backend/HDHGN/data/train/
+backend/HDHGN/data/train_c/
 backend/HDHGN/data/valid/
+backend/HDHGN/data/valid_c/
+
+backend/HDHGN/data/train_files_paths.txt
+backend/HDHGN/data/train_files_paths_c.txt
+backend/HDHGN/data/test_files_paths.txt
+backend/HDHGN/data/test_files_paths_c.txt
+backend/HDHGN/data/valid_files_paths.txt
+backend/HDHGN/data/valid_files_paths_c.txt
 
 
 # dependencies
@@ -42,11 +48,6 @@ backend/frontend/coverage
 # production
 backend/frontend/build
 
-# training files
-backend/HDHGN/data/**/*.txt
-backend/HDHGN/data/**/*.c
-backend/HDHGN/data/**/*.py
-backend/HDHGN/data/**/*.pt
 
 # misc
 .DS_Store

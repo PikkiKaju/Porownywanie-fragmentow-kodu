@@ -125,7 +125,7 @@ class FilePredictView(APIView):
     parser_classes = [MultiPartParser]
 
     # POST method to upload a new file
-    def post(self, request):
+    def post(self, request, results_size=5):
         # Check if the request is valid
         files = request.FILES.getlist('files')
         if not files:
@@ -137,27 +137,53 @@ class FilePredictView(APIView):
             file_instance = File.objects.create(file=file)
             # Run file prediction
             file_path = os.path.join(MEDIA_ROOT,"uploads", file.name)
-            results.append(self.runFilePrediction(file_path))
+            results.append(self.runFilePrediction(file_path, results_size))
             # Delete the File instance from db and storage
             file_instance.delete()
 
         return Response(json.dumps(results), status=status.HTTP_201_CREATED)
 
-    def runFilePrediction(self, file_path):
+    def runFilePrediction(self, file_path, results_size):
         '''
         Run file prediction script using HDHGN and return the results.
 
         Returns:
-        dict object: {results: [{label, similarity_value, probability}], file_type: str}
+        dict object: {
+            file_type: str, 
+            file_lang: str, 
+            results: [(
+                label: str, 
+                similarity_value: [float], 
+                probability: [float]
+            )], 
+            files_contents: [(
+                file_name: str, 
+                file_content: str
+            )]
+        }
         '''
         results, file_lang = HDHGN.PredictFile.predict(file_path)
+        
+        files_contents = []
+        results_contents = []
+        if (results is not None):
+            for i in range(len(results) if len(results) < results_size else results_size):
+                file_name = results[i][0] + (".c" if file_lang == "C" else ".py")
+                new_path = os.path.join(BASE_DIR, "HDHGN", "data", f"txt_{file_lang.lower()}_files", file_name)
+                with open(new_path, 'r') as file:
+                    file_content = file.read()
+                    files_contents.append((file_name, file_content))
+                results_contents.append((results[i][0], results[i][1], results[i][2]))
+        
         if results is not None:
             results_dict = {
                 "file_name": os.path.basename(file_path),
                 "file_lang": file_lang,
-                "results": results
+                "results": results_contents,
+                "files_contents": files_contents
             }
         else:
             results_dict = None
+            
         return results_dict
     

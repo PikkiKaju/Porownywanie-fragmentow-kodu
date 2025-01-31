@@ -26,7 +26,7 @@ urlpatterns = [
     path('wel/<int:pk>/', TextView.as_view(), name="delete-text"),
     path('file/', FileListView.as_view(), name="file"),
     path('file/<int:pk>/', FileSingleView.as_view(), name="file-by-id"),
-    path('predict/', FilePredictView.as_view(), name="predict-file"),
+    path('predict/<int:results_size>/', FilePredictView.as_view(), name="predict-file"),
 ]
 
 if settings.DEBUG:

@@ -230,8 +230,7 @@ class App extends React.Component {
   
     // Send a POST request to the server with the file data
     axios
-      .post(`${BASE_URL}/predict/`, formData, {
-        // API endpoint for file upload
+      .post(`${BASE_URL}/predict/5/`, formData, { // request a response with 5 results per sent file
         headers: {
           "Content-Type": "multipart/form-data", // Set content type for file upload
         },
@@ -277,6 +276,7 @@ class App extends React.Component {
     let data;
     try {
       data = JSON.parse(response.data);
+      console.log(data);
     } catch (error) {
       console.error("Error parsing response data:", error);
       return;
