@@ -29,6 +29,7 @@ class App extends React.Component {
       activeTab: 1, // Active tab
       displayedFile: "", // File to display, chosen by the user from the uploaded files
       uploadedFilesContent: [], // Array to store content of uploaded files
+      currentAlgorithmIndices: {}, // Tracks the current algorithm index for each file
     };
 
     // Create refs for the left and right CodeDisplay components
@@ -126,15 +127,61 @@ class App extends React.Component {
 
   handleNextFile = () => {
     this.setState((prevState) => {
-      const nextIndex = (prevState.currentFileIndex + 1) % this.state.fileDetails.name.length; // Ensure only 5 files are navigable
-      return { currentFileIndex: nextIndex };
+      const fileNames = Object.keys(prevState.fileDetails);
+      const nextFileIndex = (prevState.currentFileIndex + 1) % fileNames.length;
+      const nextFileName = fileNames[nextFileIndex];
+  
+      return {
+        currentFileIndex: nextFileIndex,
+        displayedFile: nextFileName,
+      };
     });
   };
   
   handlePreviousFile = () => {
     this.setState((prevState) => {
-      const prevIndex = (prevState.currentFileIndex - 1 + this.state.fileDetails.name.length) % this.state.fileDetails.name.length; // Wrap-around for hardcoded files
-      return { currentFileIndex: prevIndex };
+      const fileNames = Object.keys(prevState.fileDetails);
+      const prevFileIndex = (prevState.currentFileIndex - 1 + fileNames.length) % fileNames.length;
+      const prevFileName = fileNames[prevFileIndex];
+  
+      return {
+        currentFileIndex: prevFileIndex,
+        displayedFile: prevFileName,
+      };
+    });
+  };
+
+  handleNextAlgorithm = () => {
+    this.setState((prevState) => {
+      const { displayedFile, currentAlgorithmIndices, fileDetails } = prevState;
+  
+      const currentIndex = currentAlgorithmIndices[displayedFile] || 0;
+      const algorithmCount = fileDetails[displayedFile]?.name?.length || 0;
+      const nextIndex = (currentIndex + 1) % algorithmCount;
+  
+      return {
+        currentAlgorithmIndices: {
+          ...currentAlgorithmIndices,
+          [displayedFile]: nextIndex,
+        },
+      };
+    });
+  };
+  
+  handlePreviousAlgorithm = () => {
+    this.setState((prevState) => {
+      const { displayedFile, currentAlgorithmIndices, fileDetails } = prevState;
+  
+      const currentIndex = currentAlgorithmIndices[displayedFile] || 0;
+      const algorithmCount = fileDetails[displayedFile]?.name?.length || 0;
+      const prevIndex = (currentIndex - 1 + algorithmCount) % algorithmCount;
+
+      return {
+        currentAlgorithmIndices: {
+          ...currentAlgorithmIndices,
+          [displayedFile]: prevIndex,
+        },
+      };
     });
   };
 
@@ -225,9 +272,8 @@ class App extends React.Component {
 
   // Function handling the HDHGN prediction results received from the server 
   ProcessModelResults = (response) => {
-    console.log("Full response:", response);
-    
-    // Parse the response string if necessary
+    console.log("Full response:", response.data);
+  
     let data;
     try {
       data = JSON.parse(response.data);
@@ -236,24 +282,34 @@ class App extends React.Component {
       return;
     }
   
-    // Ensure data[0] and data[0].results exist before trying to access them
-    if (data && data[0] && Array.isArray(data[0].results) && data[0].results.length > 0) {
-      // Extract the first 5 algorithm names
-      const topFiveNames = data[0].results.slice(0, 5).map((item) => item[0]);
+    if (data && Array.isArray(data)) {
+      const updatedFileDetails = { ...this.state.fileDetails };
+      const updatedAlgorithmIndices = { ...this.state.currentAlgorithmIndices };
   
-      // Check if data[0].results contains enough elements for probabilities
-      const topFiveProbs = data[0].results.slice(0, 5).map((item) => {
-        return item[2]; // Extracting the third element (probability)
+      data.forEach((fileData) => {
+        if (fileData.results && Array.isArray(fileData.results) && fileData.results.length > 0) {
+          const topFiveNames = fileData.results.slice(0, 5).map((item) => item[0]); // Algorithm names
+          const topFiveProbs = fileData.results.slice(0, 5).map((item) => item[2]); // Probabilities
+  
+          // Store file_lang along with algorithm names and probabilities
+          updatedFileDetails[fileData.file_name] = {
+            name: topFiveNames,
+            prob: topFiveProbs,
+            file_lang: fileData.file_lang, // Add file_lang to the fileDetails object
+          };
+  
+          // Initialize the algorithm index for this file
+          updatedAlgorithmIndices[fileData.file_name] = 0;
+        }
       });
   
-      // Update the state
       this.setState({
-        fileDetails: {
-          id: [1, 2, 3, 4, 5],
-          name: topFiveNames,
-          prob: topFiveProbs,
-        },
+        fileDetails: updatedFileDetails,
+        currentAlgorithmIndices: updatedAlgorithmIndices,
       });
+  
+      console.log("Updated fileDetails:", updatedFileDetails);
+      console.log("Updated currentAlgorithmIndices:", updatedAlgorithmIndices);
     } else {
       console.error("Response data is empty, invalid, or missing results.");
     }
@@ -352,15 +408,23 @@ class App extends React.Component {
 
   // Render method to display the component UI
   render() {
-    const { activeTab, files, displayedFile, currentFileIndex, fileDetails, uploadedFilesContent } = this.state;
-    const currentFileName = fileDetails.name[currentFileIndex] || "No algorithm name available"; //Get current file name based on fileDetails
-    const currentProb = fileDetails.prob[currentFileIndex] || "No probability available"; // Get current file prob based on fileDetails
-    const formattedProb = (currentProb * 100).toFixed(2);
+    const { activeTab, files, displayedFile, fileDetails, uploadedFilesContent, currentAlgorithmIndices} = this.state;
     // Get the content of the currently selected file for the right box
     const fileContentToDisplay = uploadedFilesContent.find(
       (file) => file.name === displayedFile
     )?.content || uploadedFilesContent[0]?.content || "No content available";
     console.log("filedetails:",fileDetails);
+
+    const currentAlgorithmIndex = currentAlgorithmIndices[displayedFile] || 0;
+
+    const selectedFileDetails = fileDetails[displayedFile] || {};
+    const algorithmNames = selectedFileDetails.name || [];
+    const probabilities = selectedFileDetails.prob || [];
+
+    const currentAlgorithmName = algorithmNames[currentAlgorithmIndex] || "No algorithm selected";
+    const currentProbability = probabilities[currentAlgorithmIndex] || "No probability available";
+    const formattedProb = (currentProbability * 100).toFixed(2)
+
     return (
       <div className="container">
         {activeTab === 1 ? ( // tab1
@@ -421,7 +485,7 @@ class App extends React.Component {
               </div>
             </div>
             <div style={{ display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae', marginTop: '5px', marginLeft: '50%' }}>
-              {currentFileName}
+            {currentAlgorithmName}
             </div>
           </div>
             <div style={{ display: 'flex', height: '65%', justifyContent: 'center' }}>
@@ -442,7 +506,7 @@ class App extends React.Component {
               </div>
   
               {/* Left Box (Content from user selected file) */}
-              <CodeDisplay ref={this.leftBoxRef} code={currentFileName} />
+              <CodeDisplay ref={this.leftBoxRef} code={currentAlgorithmName} />
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -471,10 +535,10 @@ class App extends React.Component {
                 }}
               >
                 <ChangeFilesButton
-                  onPreviousFile={this.handlePreviousFile}
-                  onNextFile={this.handleNextFile}
-                  currentFileIndex={this.state.currentFileIndex}
-                  totalFiles={this.state.fileDetails.name.length}
+                  onPreviousFile={this.handlePreviousAlgorithm}
+                  onNextFile={this.handleNextAlgorithm}
+                  currentFileIndex={this.state.currentAlgorithmIndices[this.state.displayedFile]}
+                  totalFiles={this.state.fileDetails[this.state.displayedFile]?.name?.length || 0}
                 />
               </div>
             </div>
