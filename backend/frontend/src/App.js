@@ -22,7 +22,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       textDetails: [], // Array to store text data retrieved from the server
-      fileDetails: {id:[], name: [],prob: []}, // Array to store file data retrieved from the server
+      fileDetails: {}, // Array to store file data retrieved from the server
       inputText: "", // Input string from the user
       files: [], // File selected by the user for upload
       currentFileIndex: 0, // Track which file is being shown
@@ -291,11 +291,22 @@ class App extends React.Component {
           const topFiveNames = fileData.results.slice(0, 5).map((item) => item[0]); // Algorithm names
           const topFiveProbs = fileData.results.slice(0, 5).map((item) => item[2]); // Probabilities
   
-          // Store file_lang along with algorithm names and probabilities
+          // Extract algorithm code snippets from files_contents
+          const algorithmCodeSnippets = {};
+          if (fileData.files_contents && Array.isArray(fileData.files_contents)) {
+            fileData.files_contents.forEach(([algorithmNameWithExtension, code]) => {
+              // Remove the .py and .c extensions from the algorithm name
+              const algorithmName = algorithmNameWithExtension.replace(/\.py$/, "").replace(/\.c$/, "");
+              algorithmCodeSnippets[algorithmName] = code;
+            });
+          }
+  
+          // Store file_lang, algorithm names, probabilities, and code snippets
           updatedFileDetails[fileData.file_name] = {
             name: topFiveNames,
             prob: topFiveProbs,
-            file_lang: fileData.file_lang, // Add file_lang to the fileDetails object
+            file_lang: fileData.file_lang, // File language
+            code: algorithmCodeSnippets, // Algorithm code snippets
           };
   
           // Initialize the algorithm index for this file
@@ -420,10 +431,15 @@ class App extends React.Component {
     const selectedFileDetails = fileDetails[displayedFile] || {};
     const algorithmNames = selectedFileDetails.name || [];
     const probabilities = selectedFileDetails.prob || [];
+    //const fileLanguage = selectedFileDetails.file_lang || "Unknown";
+    const algorithmCodeSnippets = selectedFileDetails.code || {};
+    console.log(algorithmCodeSnippets)
 
     const currentAlgorithmName = algorithmNames[currentAlgorithmIndex] || "No algorithm selected";
+    const currentAlgorithmCode = algorithmCodeSnippets[currentAlgorithmName] || "No code available";
     const currentProbability = probabilities[currentAlgorithmIndex] || "No probability available";
     const formattedProb = (currentProbability * 100).toFixed(2)
+    console.log(currentAlgorithmCode)
 
     return (
       <div className="container">
@@ -506,7 +522,7 @@ class App extends React.Component {
               </div>
   
               {/* Left Box (Content from user selected file) */}
-              <CodeDisplay ref={this.leftBoxRef} code={currentAlgorithmName} />
+              <CodeDisplay ref={this.leftBoxRef} code={currentAlgorithmCode} />
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'center' }}>
