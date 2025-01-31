@@ -136,7 +136,7 @@ def splitdata_c(source_files_path: str):
     test_file.close()
     print("Finished splitting C data \n")
 
-if __name__ == '__main__':
+def ProccesData():  
     # Initialize argument parser
     parser = argparse.ArgumentParser(prog="ProcessData", description="Split the dataset into training, validation, and test sets.")
 
@@ -158,3 +158,6 @@ if __name__ == '__main__':
         print("-> Start spliting C data...")
         source_files_path_c = "data/c_files"
         splitdata_c(source_files_path_c)
+
+if __name__ == '__main__':
+    ProccesData()

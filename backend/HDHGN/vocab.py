@@ -5,7 +5,7 @@ from collections import Counter
 from colorama import Fore, Style
 import json
 
-from .utilities.utils import pre_walk_tree, pre_walk_tree_c
+from utilities.utils import pre_walk_tree, pre_walk_tree_c
 
 
 class VocabEntry:
@@ -200,7 +200,7 @@ class Vocab:
         return Vocab(vocab)
 
 
-if __name__ == '__main__':
+def make_vocab():
     # Initialize argument parser
     parser = argparse.ArgumentParser(prog="MakeVocab", description="Make vocabularies based on the source files.")
 
@@ -224,3 +224,7 @@ if __name__ == '__main__':
         v2 = Vocab.build_for_ast_c("data/train_files_paths_c.txt")
         v2.save("data/vocab4ast_c.json")
         print("Finished building C vocabulary \n")
+
+
+if __name__ == '__main__':
+    make_vocab()

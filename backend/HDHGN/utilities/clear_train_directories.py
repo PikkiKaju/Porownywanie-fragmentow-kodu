@@ -22,6 +22,8 @@ def clear_train_directories():
         "./data/vocab4ast_c.json"
     ]
 
+    print(Fore.GREEN + "Clearing train directories:" + Style.RESET_ALL)
+
     # delete directories and files
     for item_to_delete in items_to_delete:
         if os.path.isdir(item_to_delete):
@@ -52,6 +54,5 @@ def clear_train_directories():
 
 
 if __name__ == '__main__':
-    print(Fore.GREEN + "Clearing train directories:" + Style.RESET_ALL)
     clear_train_directories()
 

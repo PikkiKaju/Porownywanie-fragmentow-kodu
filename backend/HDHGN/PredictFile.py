@@ -8,9 +8,9 @@ from pycparser import c_parser, parse_file
 
 sys.path.append(os.path.dirname(__file__))
 
-from HDHGN.MyDataset import HDHGData
-from HDHGN.vocab import Vocab
-from HDHGN.utilities.utils import pre_walk_tree, pre_walk_tree_c
+from MyDataset import HDHGData
+from vocab import Vocab
+from utilities.utils import pre_walk_tree, pre_walk_tree_c
 
 
 def predict(file_path: str, model_path = "", vocab_path = ""):
@@ -80,7 +80,7 @@ def predict(file_path: str, model_path = "", vocab_path = ""):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     import warnings
     warnings.simplefilter(action='ignore', category=FutureWarning)
-    model = torch.load(model_path)
+    model = torch.load(model_path, map_location=torch.device("cuda:0" if torch.cuda.is_available() else "cpu"))
     model = model.to(device)
     model.eval()
 

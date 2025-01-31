@@ -123,8 +123,7 @@ def move_files_c(source_path, new_path, num_files=11):
                 new_file_path = os.path.join(new_folder_path, f"{i}_{new_filename}")
                 shutil.copy2(old_path, new_file_path)
 
-
-if __name__ == "__main__":
+def prepare_source_files():
     # Initialize argument parser
     parser = argparse.ArgumentParser()
 
@@ -156,3 +155,7 @@ if __name__ == "__main__":
         change_files_extensions_c(source_path_c)
         move_files_c(source_path_c, new_path_c, num_files=num_files)
         print(f"   C file extensions changed in {source_path_c} to .c and saved in {new_path_c} in separate folders.")
+
+
+if __name__ == "__main__":
+   prepare_source_files()

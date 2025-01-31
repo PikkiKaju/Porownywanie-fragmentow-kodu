@@ -4,8 +4,8 @@ import torch
 from torch_geometric.data import Dataset, Data
 from pycparser import c_parser, c_ast, parse_file
 
-from HDHGN.utilities.utils import pre_walk_tree, pre_walk_tree_c
-from HDHGN.vocab import Vocab
+from utilities.utils import pre_walk_tree, pre_walk_tree_c
+from vocab import Vocab
 
 class HDHGData(Data):
     """

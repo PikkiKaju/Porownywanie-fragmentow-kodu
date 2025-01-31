@@ -9,16 +9,20 @@ from openpyxl import load_workbook
 from tqdm import tqdm
 import xlsxwriter
 
-from HDHGN.MyDataset import HDHGNDataset
-from HDHGN.models.HDHGN import HDHGN
-from HDHGN.vocab import Vocab
-from HDHGN.utilities.utils import show_2scores, show_score
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from MyDataset import HDHGNDataset
+from models.HDHGN import HDHGN
+from vocab import Vocab
+from utilities.utils import show_2scores, show_score
 
 
-def main():
+def TrainHDHGN():
     """
     Main function to train and evaluate the HDHGN model.
     """
+    print(Fore.GREEN + "Start training on Python files..." + Style.RESET_ALL)
+    
     # Load vocabulary
     v = Vocab.load("../data/vocab4ast.json")
     
@@ -176,5 +180,4 @@ def valid(model, dataloader, device):
 
 
 if __name__ == '__main__':
-    print(Fore.GREEN + "Start training on Python files..." + Style.RESET_ALL)
-    main()
+    TrainHDHGN()
