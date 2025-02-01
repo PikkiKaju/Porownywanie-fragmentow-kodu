@@ -36,7 +36,7 @@ def TrainHDHGN_C():
 
     # Set device
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+    
     # Model parameters
     num_types = len(v.vocab["types"].word2id)
     vocab_sizes = [len(v.vocab[t].word2id) for t in v.vocab["types"].word2id]
@@ -72,10 +72,10 @@ def TrainHDHGN_C():
     # Use ReduceLROnPlateau to realize dynamic learning rate reducing based on accuracy of valid dataset can make result better.
     # However, previous work didn't use the dynamic learning rate, to ensure the comparison of our model's result with previous work results in paper is fair, we fix our learning rate to 5e-5.
     # If you want to use the dynamic learning rate, you can remove the following annotations and annotation in line 88. This will make the last result better and a little higher than results in our paper.
-    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.1, patience=1, verbose=True, eps=1e-12)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.1, patience=1, eps=1e-12)
 
-    num_epochs = 10 # changed from 50 to 10
-    max_attk, attk = 2, 0 # changed from 5 to 2
+    num_epochs = 15 # changed from 50 to 10
+    max_attk, attk = 5, 0 # changed from 5 to 2
     max_accuracy = 0
     m_epoch = 0
     loss_list, valid_loss_list, train_acc_list, valid_acc_list = [], [], [], []
@@ -99,7 +99,7 @@ def TrainHDHGN_C():
 
         train_loss /= (i + 1)
         valid_loss, valid_accuracy = valid(model, valid_dataloader, device)
-        # scheduler.step(valid_accuracy)
+        scheduler.step(valid_accuracy)
 
         loss_list.append(train_loss)
         valid_loss_list.append(valid_loss)

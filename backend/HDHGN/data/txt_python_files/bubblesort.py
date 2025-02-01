@@ -12,15 +12,3 @@ def bubble_sort(seq):
                 seq[i], seq[i+1] = seq[i+1], seq[i]
                 changed = True
     return seq
-
-if __name__ == "__main__":
-   """Sample usage and simple test suite"""
-
-   from random import shuffle
-
-   testset = [_ for _ in range(100)]
-   testcase = testset.copy() # make a copy
-   shuffle(testcase)
-   assert testcase != testset  # we've shuffled it
-   bubble_sort(testcase)
-   assert testcase == testset  # we've unshuffled it back into a copy

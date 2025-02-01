@@ -32,19 +32,3 @@ void show_matrix(double *m, int w, int h)
 	}
 }
 
-int main(void)
-{
-	int i;
-	double m[15];
-	for (i = 0; i < 15; i++) m[i] = i + 1;
-
-	puts("before transpose:");
-	show_matrix(m, 3, 5);
-
-	transpose(m, 3, 5);
-
-	puts("\nafter transpose:");
-	show_matrix(m, 5, 3);
-
-	return 0;
-}

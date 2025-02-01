@@ -27,13 +27,3 @@ void cocktailsort(int *a, size_t n) {
 		}
 	}
 }
-
-int main(void) {
-	int a[] = { 5, -1, 101, -4, 0, 1, 8, 6, 2, 3 };
-	size_t n = sizeof(a)/sizeof(a[0]);
-
-	cocktailsort(a, n);
-	for (size_t i = 0; i < n; ++i)
-		printf("%d ", a[i]);
-	return 0;
-}

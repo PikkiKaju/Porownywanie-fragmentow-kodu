@@ -29,7 +29,3 @@ def until(p):
             v = f(v)
         return v
     return lambda f: lambda x: go(f, x)
-
-
-if __name__ == '__main__':
-    main()

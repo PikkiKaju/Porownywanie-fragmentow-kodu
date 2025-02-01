@@ -25,13 +25,3 @@ void bogosort(int *a, int n)
 {
   while ( !is_sorted(a, n) ) shuffle(a, n);
 }
-
-int main()
-{
-  int numbers[] = { 1, 10, 9,  7, 3, 0 };
-  int i;
-
-  bogosort(numbers, 6);
-  for (i=0; i < 6; i++) printf("%d ", numbers[i]);
-  printf("\n");
-}

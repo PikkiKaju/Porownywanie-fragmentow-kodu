@@ -1,4 +1,4 @@
-python utilities\prepare_source_files.py
+python utilities\prepare_source_files.py -n 10
 python utilities\clear_train_directories.py
 
 python ProcessData.py -p -c

@@ -74,8 +74,8 @@ def TrainHDHGN():
     # If you want to use the dynamic learning rate, you can remove the following annotations and annotation in line 88. This will make the last result better and a little higher than results in our paper.
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="max", factor=0.1, patience=1, verbose=True, eps=1e-12)
 
-    num_epochs = 10 # changed from 50 to 10 
-    max_attk, attk = 2, 0 # changed from 5 to 2
+    num_epochs = 15 # changed from 50 to 10 
+    max_attk, attk = 5, 0 # changed from 5 to 2
     max_accuracy = 0
     m_epoch = 0
     loss_list, valid_loss_list, train_acc_list, valid_acc_list = [], [], [], []

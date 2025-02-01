@@ -24,11 +24,3 @@ void circle_sort(int *x, int n)
 		putchar('\n');
 	} while (circle_sort_inner(x, x + (n - 1)));
 }
-
-int main(void)
-{
-	int x[] = {5, -1, 101, -4, 0, 1, 8, 6, 2, 3};
-	circle_sort(x, sizeof(x) / sizeof(*x));
-
-	return 0;
-}

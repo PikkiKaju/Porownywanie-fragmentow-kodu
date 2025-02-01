@@ -37,14 +37,3 @@ def cycleSort(vector):
             writes += 1
  
     return writes
-
-
-if __name__ == '__main__':
-    x = [0, 1, 2, 2, 2, 2, 1, 9, 3.5, 5, 8, 4, 7, 0, 6]
-    xcopy = x[::]
-    writes = cycleSort(xcopy)
-    if xcopy != sorted(x):
-        print('Wrong order!')
-    else:
-        print('%r\nIs correctly sorted using cycleSort to'
-              '\n%r\nUsing %i writes.' % (x, xcopy, writes))

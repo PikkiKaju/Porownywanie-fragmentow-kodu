@@ -13,20 +13,3 @@ void insertion_sort(int *a, const size_t n) {
 		a[j] = key;
 	}
 }
-
-int main (int argc, char** argv) {
-
-    int a[] = {4, 65, 2, -31, 0, 99, 2, 83, 782, 1};
-
-    const size_t n = sizeof(a) / sizeof(a[0]) ;   // array extent 
-
-    for (size_t i = 0; i < n; i++)
-        printf("%d%s", a[i], (i == (n - 1))? "\n" : " ");
-
-    insertion_sort(a, n);
-
-    for (size_t i = 0; i < n; i++)
-        printf("%d%s", a[i], (i == (n - 1))? "\n" : " ");
-
-    return 0;
-}

@@ -21,11 +21,3 @@ def fibs(n):
         go
     )]
 
-
-# MAIN ---
-if __name__ == '__main__':
-    print(
-        'First twenty: ' + repr(
-            fibs(20)
-        )
-    )

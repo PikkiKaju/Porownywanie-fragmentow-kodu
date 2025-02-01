@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 double det_in(double **in, int n, int perm)
 {

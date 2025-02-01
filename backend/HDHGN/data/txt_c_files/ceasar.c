@@ -36,17 +36,3 @@ void rot(int c, char *str)
 
 	}
 }
-
-
-int main(int argc, char** argv)
-{
-	char str[] = "This is a top secret text message!";
-	
-	printf("Original: %s\n", str);
-	caesar(str);
-	printf("Encrypted: %s\n", str);
-	decaesar(str);
-	printf("Decrypted: %s\n", str);
-	
-	return 0;
-}

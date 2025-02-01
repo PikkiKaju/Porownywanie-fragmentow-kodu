@@ -9,10 +9,3 @@ def lcs(s1, s2, m, n):
     else:
         return max(lcs(s1, s2, m, n - 1), lcs(s1, s2, m - 1, n))
 
-if __name__ == "__main__":
-    s1 = "AGGTAB"
-    s2 = "GXTXAYB"
-    m = len(s1)
-    n = len(s2)
-
-    print(lcs(s1, s2, m, n))

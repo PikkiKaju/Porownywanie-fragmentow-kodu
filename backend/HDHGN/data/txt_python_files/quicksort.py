@@ -16,6 +16,3 @@ def quick_sort(sequence):
     greater = quick_sort(greater)
     return lesser + equal + greater
 
-
-a = [4, 65, 2, -31, 0, 99, 83, 782, 1]
-a = quick_sort(a)

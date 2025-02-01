@@ -1,9 +1,4 @@
-#python3
-#tests: expect no output.
-#doctest with  python3 -m doctest thisfile.py
-#additional tests:  python3 thisfile.py
-
-def circle_sort_backend(A:list, L:int, R:int)->'sort A in place, returning the number of swaps':
+def circle_sort_backend(A:list, L:int, R:int):
     '''
         >>> L = [3, 2, 8, 28, 2,]
         >>> circle_sort(L)
@@ -30,7 +25,7 @@ def circle_sort_backend(A:list, L:int, R:int)->'sort A in place, returning the n
         swaps += 1
     return swaps + circle_sort_backend(A, L, L+m) + circle_sort_backend(A, L+m, R)
 
-def circle_sort(L:list)->'sort A in place, returning the number of swaps':
+def circle_sort(L:list):
     swaps = 0
     s = 1
     while s:
@@ -38,16 +33,3 @@ def circle_sort(L:list)->'sort A in place, returning the number of swaps':
         swaps += s
     return swaps
 
-# more tests!
-if __name__ == '__main__':
-    from random import shuffle
-    for i in range(309):
-        L = list(range(i))
-        M = L[:]
-        shuffle(L)
-        N = L[:]
-        circle_sort(L)
-        if L != M:
-            print(len(L))
-            print(N)
-            print(L)

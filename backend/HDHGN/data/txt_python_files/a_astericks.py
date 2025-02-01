@@ -88,15 +88,3 @@ def AStarSearch(start, end, graph):
 			F[neighbour] = G[neighbour] + H
 
 	raise RuntimeError("A* failed to find a solution")
-
-if __name__=="__main__":
-	graph = AStarGraph()
-	result, cost = AStarSearch((0,0), (7,7), graph)
-	print ("route", result)
-	print ("cost", cost)
-	plt.plot([v[0] for v in result], [v[1] for v in result])
-	for barrier in graph.barriers:
-		plt.plot([v[0] for v in barrier], [v[1] for v in barrier])
-	plt.xlim(-1,8)
-	plt.ylim(-1,8)
-	plt.show()

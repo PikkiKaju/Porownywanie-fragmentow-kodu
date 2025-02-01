@@ -20,8 +20,3 @@ def patience_sort(n):
 
     # use a heap-based merge to merge piles efficiently
     n[:] = merge(*[reversed(pile) for pile in piles])
-
-if __name__ == "__main__":
-    a = [4, 65, 2, -31, 0, 99, 83, 782, 1]
-    patience_sort(a)
-    print(a)

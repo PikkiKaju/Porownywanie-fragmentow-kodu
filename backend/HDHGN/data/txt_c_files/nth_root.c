@@ -26,9 +26,3 @@ double root (int n, double x) {
     return r;
 }
 
-int main () {
-    int n = 15;
-    double x = pow_(-3.14159, 15);
-    printf("root(%d, %g) = %g\n", n, x, root(n, x));
-    return 0;
-}
