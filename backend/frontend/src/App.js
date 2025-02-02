@@ -456,14 +456,14 @@ class App extends React.Component {
             </form>
           </div>
         ) : ( // tab2
-          <div style={{ height: '100vh', textAlign: 'center' }}>
+          <div style={{ height: '100vh', width: '100vw', textAlign: 'center' }}>
           {/* Label with measure of similarity */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 width: '100%',
-                height: '20%',
+                height: '10%',
               }}
             >
               <button
