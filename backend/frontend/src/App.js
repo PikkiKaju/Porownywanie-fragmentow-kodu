@@ -30,6 +30,7 @@ class App extends React.Component {
       displayedFile: "", // File to display, chosen by the user from the uploaded files
       uploadedFilesContent: [], // Array to store content of uploaded files
       currentAlgorithmIndices: {}, // Tracks the current algorithm index for each file
+      filesState: "", // Tracks "loading" of the output
     };
 
     // Create refs for the left and right CodeDisplay components
@@ -227,6 +228,7 @@ class App extends React.Component {
     // Create a new FormData object and append the uploaded files to it
     const formData = new FormData();
     files.forEach((file, i) => formData.append(`files`, file, file.name));
+    this.HandleChangeLoading(1)
   
     // Send a POST request to the server with the file data
     axios
@@ -239,10 +241,12 @@ class App extends React.Component {
         this.readFileContent(files); // Read the file content after upload and save it to uploadedFilesContent
         this.switchTab(2);  // Switch to tab 2
         this.ProcessModelResults(res); // Process the model results from the server
+        this.HandleChangeLoading(0)
       })
       .catch((err) => {
         console.error("Error uploading file: ", err);
-        alert("Nie udało się wysłać pliku");
+        alert("Nie udało się wysłać pliku lub zawartość pliku jest błędna");
+        this.HandleChangeLoading(0)
       });
   };
 
@@ -407,6 +411,16 @@ class App extends React.Component {
     this.setState({ displayedFile: event.target.value });
   };
 
+  HandleChangeLoading = (op) => {
+    if (op == 1) {
+      this.setState({filesState: 'Przesyłanie...'})
+    }
+    if (op == 0) {
+      this.setState({filesState: ''})
+    }
+    
+  }
+
   // Returns files names
   getFileNames = () => {
     return this.state.fileDetails.map(file => file.name); 
@@ -423,7 +437,7 @@ class App extends React.Component {
     // Get the content of the currently selected file for the right box
     const fileContentToDisplay = uploadedFilesContent.find(
       (file) => file.name === displayedFile
-    )?.content || uploadedFilesContent[0]?.content || "No content available";
+    )?.content || uploadedFilesContent[0]?.content || "Brak zawartości";
     console.log("filedetails:",fileDetails);
 
     const currentAlgorithmIndex = currentAlgorithmIndices[displayedFile] || 0;
@@ -435,16 +449,18 @@ class App extends React.Component {
     const algorithmCodeSnippets = selectedFileDetails.code || {};
     console.log(algorithmCodeSnippets)
 
-    const currentAlgorithmName = algorithmNames[currentAlgorithmIndex] || "No algorithm selected";
-    const currentAlgorithmCode = algorithmCodeSnippets[currentAlgorithmName] || "No code available";
-    const currentProbability = probabilities[currentAlgorithmIndex] || "No probability available";
+    const currentAlgorithmName = algorithmNames[currentAlgorithmIndex] || "Brak wybranego algorytmu";
+    const currentAlgorithmCode = algorithmCodeSnippets[currentAlgorithmName] || "Brak - nieprawidłowa zawartość oryginalnego pliku";
+    const currentProbability = probabilities[currentAlgorithmIndex] || "Prawdopodobieństwo niedostępne";
     const formattedProb = (currentProbability * 100).toFixed(2)
     console.log(currentAlgorithmCode)
+
 
     return (
       <div className="container">
         {activeTab === 1 ? ( // tab1
-          <div>
+          <div style={{height: '100vh'}}>
+            <p style={{marginTop: '13%', textAlign: 'center', color: 'white', height: '3%'}}>{this.state.filesState}</p>
             <Header />
             <FileUploader
               files={files}
@@ -492,7 +508,7 @@ class App extends React.Component {
               </h1>
             </div>
             <div style={{ display: 'flex', marginTop: '40px', flexDirection: 'column' }}>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex'}}>
               <div style={{ display: 'flex', width: '50%', justifyContent: 'center', color: '#6a64ae' }}>
                 ORYGINALNY KOD
               </div>
