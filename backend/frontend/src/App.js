@@ -412,10 +412,10 @@ class App extends React.Component {
   };
 
   HandleChangeLoading = (op) => {
-    if (op == 1) {
+    if (op === 1) {
       this.setState({filesState: 'Przesyłanie...'})
     }
-    if (op == 0) {
+    if (op === 0) {
       this.setState({filesState: ''})
     }
     
