@@ -10,6 +10,7 @@ import ChangeFilesButton from "./Components/ChangeFilesButton.js";
 import Scroll from "./Components/Scroll.js";
 import DropDown from './Components/DropDown.js'
 import { createRef } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const BASE_URL = "http://localhost:8000";
  
@@ -21,6 +22,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      fileUuidMap: {},
       textDetails: [], // Array to store text data retrieved from the server
       fileDetails: {}, // Array to store file data retrieved from the server
       inputText: "", // Input string from the user
@@ -207,6 +209,7 @@ class App extends React.Component {
         // Read the file content after upload and save it to uploadedFilesContent
         this.readFileContent(files);
         this.switchTab(2);  // Switch to tab 2
+        this.getFileData(); // Refetch files data after upload
       })
       .catch((err) => {
         console.error("Error uploading file: ", err);
@@ -225,29 +228,33 @@ class App extends React.Component {
       return;
     }
 
-    // Create a new FormData object and append the uploaded files to it
     const formData = new FormData();
-    files.forEach((file, i) => formData.append(`files`, file, file.name));
-    this.HandleChangeLoading(1)
-  
-    // Send a POST request to the server with the file data
-    axios
-      .post(`${BASE_URL}/predict/5/`, formData, { // request a response with 5 results per sent file
-        headers: {
-          "Content-Type": "multipart/form-data", // Set content type for file upload
-        },
-      })
-      .then((res) => {        
-        this.readFileContent(files); // Read the file content after upload and save it to uploadedFilesContent
-        this.switchTab(2);  // Switch to tab 2
-        this.ProcessModelResults(res); // Process the model results from the server
-        this.HandleChangeLoading(0)
-      })
-      .catch((err) => {
-        console.error("Error uploading file: ", err);
-        alert("Nie udało się wysłać pliku lub zawartość pliku jest błędna");
-        this.HandleChangeLoading(0)
-      });
+    const fileUuidMap = {}; // Temporary mapping
+    // Add UUID to each file
+    files.forEach((file) => {
+      const uniqueFileName = uuidv4(); // Generate unique identifier
+      fileUuidMap[file.name] = uniqueFileName; // Store mapping
+      formData.append('files', file, uniqueFileName); // Send file with UUID as the name
+    });
+
+    this.setState({ fileUuidMap }, () => {
+      // Send a POST request to the server with the file data
+      axios
+        .post(`${BASE_URL}/predict/5/`, formData, { // request a response with 5 results per sent file
+          headers: {
+            "Content-Type": "multipart/form-data", // Set content type for file upload
+          },
+        })
+        .then((res) => {        
+          this.readFileContent(files); // Read the file content after upload and save it to uploadedFilesContent
+          this.switchTab(2);  // Switch to tab 2
+          this.ProcessModelResults(res); // Process the model results from the server
+        })
+        .catch((err) => {
+          console.error("Error uploading file: ", err);
+          alert("Nie udało się wysłać pliku");
+        });
+    });
   };
 
   readFileContent = (files) => {
@@ -286,30 +293,31 @@ class App extends React.Component {
       const updatedAlgorithmIndices = { ...this.state.currentAlgorithmIndices };
   
       data.forEach((fileData) => {
+        // Convert UUID back to the original file name
+        const originalFileName = Object.keys(this.state.fileUuidMap).find(
+          (key) => this.state.fileUuidMap[key] === fileData.file_name
+        ) || fileData.file_name; // Use UUID if mapping fails
+  
         if (fileData.results && Array.isArray(fileData.results) && fileData.results.length > 0) {
           const topFiveNames = fileData.results.slice(0, 5).map((item) => item[0]); // Algorithm names
           const topFiveProbs = fileData.results.slice(0, 5).map((item) => item[2]); // Probabilities
   
-          // Extract algorithm code snippets from files_contents
           const algorithmCodeSnippets = {};
           if (fileData.files_contents && Array.isArray(fileData.files_contents)) {
             fileData.files_contents.forEach(([algorithmNameWithExtension, code]) => {
-              // Remove the .py and .c extensions from the algorithm name
               const algorithmName = algorithmNameWithExtension.replace(/\.py$/, "").replace(/\.c$/, "");
               algorithmCodeSnippets[algorithmName] = code;
             });
           }
   
-          // Store file_lang, algorithm names, probabilities, and code snippets
-          updatedFileDetails[fileData.file_name] = {
+          updatedFileDetails[originalFileName] = {
             name: topFiveNames,
             prob: topFiveProbs,
-            file_lang: fileData.file_lang, // File language
-            code: algorithmCodeSnippets, // Algorithm code snippets
+            file_lang: fileData.file_lang,
+            code: algorithmCodeSnippets,
           };
   
-          // Initialize the algorithm index for this file
-          updatedAlgorithmIndices[fileData.file_name] = 0;
+          updatedAlgorithmIndices[originalFileName] = 0;
         }
       });
   
