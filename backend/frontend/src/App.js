@@ -263,9 +263,6 @@ class App extends React.Component {
               uploadedFilesContent: fileContents,
               displayedFile: fileContents[0]?.name || "", // Set the first file as default
             },
-            () => {
-              console.log('Updated uploadedFilesContent:', this.state.uploadedFilesContent);
-            }
           );
         }
       };
@@ -274,9 +271,7 @@ class App extends React.Component {
   };
 
   // Function handling the HDHGN prediction results received from the server 
-  ProcessModelResults = (response) => {
-    console.log("Full response:", response.data);
-  
+  ProcessModelResults = (response) => {  
     let data;
     try {
       data = JSON.parse(response.data);
@@ -323,8 +318,6 @@ class App extends React.Component {
         currentAlgorithmIndices: updatedAlgorithmIndices,
       });
   
-      console.log("Updated fileDetails:", updatedFileDetails);
-      console.log("Updated currentAlgorithmIndices:", updatedAlgorithmIndices);
     } else {
       console.error("Response data is empty, invalid, or missing results.");
     }
@@ -438,7 +431,6 @@ class App extends React.Component {
     const fileContentToDisplay = uploadedFilesContent.find(
       (file) => file.name === displayedFile
     )?.content || uploadedFilesContent[0]?.content || "Brak zawartości";
-    console.log("filedetails:",fileDetails);
 
     const currentAlgorithmIndex = currentAlgorithmIndices[displayedFile] || 0;
 
@@ -447,13 +439,11 @@ class App extends React.Component {
     const probabilities = selectedFileDetails.prob || [];
     //const fileLanguage = selectedFileDetails.file_lang || "Unknown";
     const algorithmCodeSnippets = selectedFileDetails.code || {};
-    console.log(algorithmCodeSnippets)
 
     const currentAlgorithmName = algorithmNames[currentAlgorithmIndex] || "Brak wybranego algorytmu";
     const currentAlgorithmCode = algorithmCodeSnippets[currentAlgorithmName] || "Brak - nieprawidłowa zawartość oryginalnego pliku";
     const currentProbability = probabilities[currentAlgorithmIndex] || "Prawdopodobieństwo niedostępne";
-    const formattedProb = (currentProbability * 100).toFixed(2)
-    console.log(currentAlgorithmCode)
+    const formattedProb = (currentProbability * 100).toFixed(2);
 
 
     return (
