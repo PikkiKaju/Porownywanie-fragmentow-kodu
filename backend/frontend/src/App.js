@@ -282,7 +282,6 @@ class App extends React.Component {
     let data;
     try {
       data = JSON.parse(response.data);
-      console.log(data);
     } catch (error) {
       console.error("Error parsing response data:", error);
       return;
